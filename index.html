@@ -20,12 +20,12 @@
   </style>
 </head>
 <body>
-<canvas width="450" height="450" id="game"></canvas>
+<canvas width="400" height="400" id="game"></canvas>
 <script>
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
 
-var grid = 100;
+var grid = 24;
 var count = 0;
   
 var snake = {
@@ -121,7 +121,7 @@ function loop() {
         snake.x = 160;
         snake.y = 160;
         snake.cells = [];
-        snake.maxCells = 4;
+        snake.maxCells = 1;
         snake.dx = grid;
         snake.dy = 0;
 
