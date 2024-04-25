@@ -9,7 +9,7 @@
   }
 
   body {
-    background: black;
+    background: orange;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,7 +20,7 @@
   </style>
 </head>
 <body>
-<canvas width="400" height="400" id="game"></canvas>
+<canvas width="200" height="200" id="game"></canvas>
 <script>
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
@@ -40,7 +40,7 @@ var snake = {
   cells: [],
   
   // length of the snake. grows when eating an apple
-  maxCells: 1000
+  maxCells: 100
 };
 var apple = {
   x: 320,
