@@ -9,7 +9,7 @@
   }
 
   body {
-    background: orange;
+    background: black;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,10 +20,10 @@
   </style>
 </head>
 <body>
-<canvas width="200" height="200" id="game"></canvas>
+<canvas width="400" height="400" id="game"></canvas>
 <script>
 var canvas = document.getElementById('game');
-var context = canvas.getContext('2d');
+var context = canvas.getContext('3d');
 
 var grid = 16;
 var count = 0;
@@ -98,7 +98,7 @@ function loop() {
   context.fillRect(apple.x, apple.y, grid-1, grid-1);
 
   // draw snake one cell at a time
-  context.fillStyle = 'green';
+  context.fillStyle = 'orange';
   snake.cells.forEach(function(cell, index) {
     
     // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
