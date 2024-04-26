@@ -165,13 +165,16 @@ document.addEventListener('keydown', function(e) {
 });
 
   function changeDirection() {
-    if (snake.dy === 0)
-      snake.dy = (snake.dx > 0 ? grid : -grid);
+    let xdir = snake.dx;
+    let ydir = snake.dy;
+    
+    if (ydir === 0)
+      snake.dy = (xdir > 0 ? grid : -grid);
     else 
       snake.dy = 0;
 
-    if (snake.dx === 0)
-      snake.dx = (snake.dy < 0 ? grid : -grid);
+    if (xdir === 0)
+      snake.dx = (ydir > 0 ? -grid : grid);
     else
       snake.dx = 0;
   }
