@@ -58,10 +58,7 @@ function getRandomInt(min, max) {
 
 // game loop
 function loop() {
-  requestAnimationFrame(loop);
-
-  game.hidden = false;
-  
+  requestAnimationFrame(loop);  
   // slow game loop to 15 fps instead of 60 (60/15 = 4)
   if (++count < 4) {
     return;
@@ -166,13 +163,33 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+function toggleMenu() {
+  menu.hidden = !menu.hidden;
+  if (menu.hidden === false) {
+      game.hidden = false;
+      gameMenu.hidden = false;
+      requestAnimationFrame(loop);
+  } else {
+    gameMenu.hidden = true;
+    game.hidden = true;
+  }
+}
+
 </script>
-<p> 
+<div id="menu">
   <h1 style="color: white;">The Cool Website</h1><br>
   <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br>
-  <input id="clickMe" type="button" value="Start Game" onclick="requestAnimationFrame(loop);" />
+  <input id="clickMe" type="button" value="Start Game" onclick="toggleMenu();" />
   </p>
   <br>
+</div>
+<div id="gameMenu">
+  <h1 style="color: white;">The Cool Website</h1><br>
+  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br>
+  <input id="clickMe" type="button" value="Menu" onclick="toggleMenu();" />
+  <br>
+</div>
+    
 </body>
 </html>
 
