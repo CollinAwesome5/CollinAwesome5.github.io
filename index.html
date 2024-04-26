@@ -166,12 +166,12 @@ document.addEventListener('keydown', function(e) {
 
   function changeDirection() {
     if (snake.dy !== 0)
-      snake.dy = snake.dx > 0 ? grid : -grid;
+      snake.dy = (snake.dx > 0 ? grid : -grid);
     else 
       snake.dy = 0;
 
     if (snake.dx !== 0)
-      snake.dx = snake.dy > 0 ? grid : -grid;
+      snake.dx = (snake.dy < 0 ? grid : -grid);
     else
       snake.dx = 0;
   }
