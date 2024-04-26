@@ -112,13 +112,21 @@ function loop() {
       apple.x = getRandomInt(0, 25) * grid;
       apple.y = getRandomInt(0, 25) * grid;
     }
-
-
-
-
-
-
     
+// check collision with all cells after this one (modified bubble sort)
+    for (var i = index + 1; i < snake.cells.length; i++) { 
+      // snake occupies same space as a body part. reset game 
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        snake.x = 160; 
+        snake.y = 160; 
+        snake.cells = []; 
+        snake.maxCells = 1; 
+        snake.dx = grid; 
+        snake.dy = 0; 
+        apple.x = getRandomInt(0, 25) * grid; 
+        apple.y = getRandomInt(0, 25) * grid; } } }); }
+
+
 
 // listen to keyboard events to move the snake
 document.addEventListener('keydown', function(e) {
