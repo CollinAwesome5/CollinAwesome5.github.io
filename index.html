@@ -168,24 +168,24 @@ function toggleMenu() {
   if (menu.hidden === true) {
       game.hidden = false;
       gameMenu.hidden = false;
-      requestAnimationFrame(loop);
   } else {
     gameMenu.hidden = true;
     game.hidden = true;
   }
 }
-
+requestAnimationFrame(loop);
+  
 </script>
 <div id="menu">
   <h1 style="color: white;">The Cool Website</h1><br>
-  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br>
+  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
   <input type="button" value="Start Game" onclick="toggleMenu();" />
   </p>
   <br>
 </div>
 <div id="gameMenu" hidden>
   <h1 style="color: white;">The Cool Website</h1><br>
-  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br>
+  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
   <input type="button" value="Menu" onclick="toggleMenu();" />
   <br>
 </div>
