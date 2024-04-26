@@ -22,7 +22,7 @@
 </head>
 <body>
   
-<canvas width="400" height="400" id="game"></canvas>
+<canvas width="400" height="400" id="game" hidden></canvas>
 <script>
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
@@ -59,6 +59,8 @@ function getRandomInt(min, max) {
 function loop() {
   requestAnimationFrame(loop);
 
+  game.hidden = false;
+  
   // slow game loop to 15 fps instead of 60 (60/15 = 4)
   if (++count < 4) {
     return;
