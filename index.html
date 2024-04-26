@@ -134,6 +134,7 @@ function loop() {
   });
 }
 
+  document.addEventListener('touchdown', changeDirection);
 // listen to keyboard events to move the snake
 document.addEventListener('keydown', function(e) {
   // prevent snake from backtracking on itself by checking that it's 
@@ -162,6 +163,18 @@ document.addEventListener('keydown', function(e) {
     snake.dx = 0;
   }
 });
+
+  function changeDirection() {
+    if (snake.dy !== 0)
+      snake.dy = grid;
+    else 
+      snake.dy = 0;
+
+    if (snake.dx !== 0)
+      snake.dx = grid;
+    else
+      snake.dx = 0;
+  }
 
 function toggleMenu() {
   menu.hidden = !menu.hidden;
