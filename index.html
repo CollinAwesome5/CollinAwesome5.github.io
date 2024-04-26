@@ -25,7 +25,7 @@
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
 
-var grid = 24;
+var grid = 16;
 var count = 0;
   
 var snake = {
@@ -40,7 +40,7 @@ var snake = {
   cells: [],
   
   // length of the snake. grows when eating an apple
-  maxCells: 100
+  maxCells: 4
 };
 var apple = {
   x: 320,
@@ -95,10 +95,10 @@ function loop() {
 
   // draw apple
   context.fillStyle = 'red';
-  context.fillRect(apple.x, apple.y, grid-2, grid-2);
- 
+  context.fillRect(apple.x, apple.y, grid-1, grid-1);
+
   // draw snake one cell at a time
-  context.fillStyle = 'orange';
+  context.fillStyle = 'green';
   snake.cells.forEach(function(cell, index) {
     
     // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
@@ -112,21 +112,25 @@ function loop() {
       apple.x = getRandomInt(0, 25) * grid;
       apple.y = getRandomInt(0, 25) * grid;
     }
-    
-// check collision with all cells after this one (modified bubble sort)
-    for (var i = index + 1; i < snake.cells.length; i++) { 
-      // snake occupies same space as a body part. reset game 
+
+    // check collision with all cells after this one (modified bubble sort)
+    for (var i = index + 1; i < snake.cells.length; i++) {
+      
+      // snake occupies same space as a body part. reset game
       if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-        snake.x = 160; 
-        snake.y = 160; 
-        snake.cells = []; 
-        snake.maxCells = 1; 
-        snake.dx = grid; 
-        snake.dy = 0; 
-        apple.x = getRandomInt(0, 25) * grid; 
-        apple.y = getRandomInt(0, 25) * grid; } } }); }
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
 
-
+        apple.x = getRandomInt(0, 25) * grid;
+        apple.y = getRandomInt(0, 25) * grid;
+      }
+    }
+  });
+}
 
 // listen to keyboard events to move the snake
 document.addEventListener('keydown', function(e) {
@@ -161,7 +165,7 @@ document.addEventListener('keydown', function(e) {
 requestAnimationFrame(loop);
 </script>
 </body>
-</html> 
+</html>
 <html>
   <head>
     <title> the cool website </title>
