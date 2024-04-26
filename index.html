@@ -177,3 +177,57 @@ requestAnimationFrame(loop);
   </body>
 </html>
 
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      border: 1px solid white;
+    }
+  </style>
+</head>
+<body>
+  <canvas width="400" height="400" id="game"></canvas>
+  <button id="resetButton">Reset Game</button> <!-- Add the reset button here -->
+  <script>
+    var canvas = document.getElementById('game');
+    var context = canvas.getContext('2d');
+
+    // ... (rest of your existing code)
+
+    // Function to reset the game
+    function resetGame() {
+      // Reset snake position, apple position, and any other game state variables
+      snake.x = 160;
+      snake.y = 160;
+      snake.cells = [];
+      // ... (reset other variables as needed)
+
+      // Clear the canvas
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Attach an event listener to the reset button
+    var resetButton = document.getElementById('resetButton');
+    resetButton.addEventListener('click', resetGame);
+
+    // ... (rest of your existing game logic)
+
+  </script>
+</body>
+</html>
