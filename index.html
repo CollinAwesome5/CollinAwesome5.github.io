@@ -41,7 +41,7 @@
 <script src="./spaceinvaders.js"></script>
   
 <div id="starfield"></div>
-<div id="spaceInvadersContainer">
+<div id="spaceInvadersContainer" hidden>
   <canvas id="spaceInvadersCanvas"></canvas>
 </div>
        
@@ -260,31 +260,38 @@ document.addEventListener('keydown', function(e) {
       snake.dx = 0;
   }
 
-function toggleMenu() {
-  menu.hidden = !menu.hidden;
-  if (menu.hidden === true) {
-      game.hidden = false;
-      gameMenu.hidden = false;
-  } else {
-    gameMenu.hidden = true;
-    game.hidden = true;
+var activeGame = 'none';
+function setActiveGame(gameName) {
+  activeGame = gameName;
+  selectGameMenu.hidden = true;
+  game.hidden = true;
+  inGameMenu.hidden = true;
+  spaceInvadersContainer.hidden = true;
+  
+  switch (activeGame) {
+    case 'none': selectGameMenu.hidden = false; break;
+    case 'spaceInvaders': spaceInvadersContainer.hidden = false; inGameMenu.hidden = false; break;
+    case 'snakeGame': game.hidden = false; inGameMenu.hidden = false; break;
+    default: selectGameMenu.hidden = false; break;
   }
 }
+  
 requestAnimationFrame(loop);
   
 </script>
-<div id="menu">
+<div id="selectGameMenu">
   <h1 style="color: white;">The Cool Website</h1>
  <p style="color: white;">more games coming soon</p>
   <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-  <input type="button" value="Snake Game" onclick="toggleMenu();" />
+  <input type="button" value="Snake Game" onclick="setActiveGame('snakeGame');" />
+  <input type="button" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
   </p>
   <br>
 </div>
-<div id="gameMenu" hidden>
+<div id="inGameMenu" hidden>
   <h1 style="color: white;">The Cool Website</h1>
   <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-  <input type="button" value="Menu" onclick="toggleMenu();" />
+  <input type="button" value="Menu" onclick="setActiveGame('none');" />
   <br>
 </div>
     
