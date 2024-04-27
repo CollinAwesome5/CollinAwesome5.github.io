@@ -156,9 +156,9 @@ function GameLoop(siGame) {
         var dt = 1 / siGame.config.fps;
 
         //  Get the drawing context.
-        console.log(`this.gameCanvas = ${this.gameCanvas}`);
-	console.log(this);
-	var ctx = this.gameCanvas.getContext("2d");
+        console.log(`siGame.gameCanvas = ${siGame.gameCanvas}`);
+	console.log(siGame);
+	var ctx = siGame.gameCanvas.getContext("2d");
         
         //  Update if we have an update function. Also draw
         //  if we have a draw function.
