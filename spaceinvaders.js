@@ -7,7 +7,7 @@
 */
 
 /*  
-    Game Class
+    SIGame Class
 
     The Game class represents a Space Invaders game.
     Create an instance of it, change any of the default values
@@ -28,7 +28,7 @@ var KEY_RIGHT = 39;
 var KEY_SPACE = 32;
 
 //  Creates an instance of the Game class.
-function Game() {
+function SIGame() {
 
     //  Set the initial config.
     this.config = {
@@ -76,7 +76,7 @@ function Game() {
 }
 
 //  Initialis the Game with a canvas.
-Game.prototype.initialise = function(gameCanvas) {
+SIGame.prototype.initialise = function(gameCanvas) {
 
     //  Set the game canvas.
     this.gameCanvas = gameCanvas;
@@ -94,7 +94,7 @@ Game.prototype.initialise = function(gameCanvas) {
     };
 };
 
-Game.prototype.moveToState = function(state) {
+SIGame.prototype.moveToState = function(state) {
  
    //  If we are in a state, leave it.
    if(this.currentState() && this.currentState().leave) {
@@ -113,7 +113,7 @@ Game.prototype.moveToState = function(state) {
  };
 
 //  Start the Game.
-Game.prototype.start = function() {
+SIGame.prototype.start = function() {
 
     //  Move into the 'welcome' state.
     this.moveToState(new WelcomeState());
@@ -129,12 +129,12 @@ Game.prototype.start = function() {
 };
 
 //  Returns the current state.
-Game.prototype.currentState = function() {
+SIGame.prototype.currentState = function() {
     return this.stateStack.length > 0 ? this.stateStack[this.stateStack.length - 1] : null;
 };
 
 //  Mutes or unmutes the game.
-Game.prototype.mute = function(mute) {
+SIGame.prototype.mute = function(mute) {
 
     //  If we've been told to mute, mute.
     if(mute === true) {
@@ -169,7 +169,7 @@ function GameLoop(game) {
     }
 }
 
-Game.prototype.pushState = function(state) {
+SIGame.prototype.pushState = function(state) {
 
     //  If there's an enter function for the new state, call it.
     if(state.enter) {
@@ -179,7 +179,7 @@ Game.prototype.pushState = function(state) {
     this.stateStack.push(state);
 };
 
-Game.prototype.popState = function() {
+SIGame.prototype.popState = function() {
 
     //  Leave and pop the state.
     if(this.currentState()) {
@@ -193,12 +193,12 @@ Game.prototype.popState = function() {
 };
 
 //  The stop function stops the game.
-Game.prototype.stop = function Stop() {
+SIGame.prototype.stop = function Stop() {
     clearInterval(this.intervalId);
 };
 
 //  Inform the game a key is down.
-Game.prototype.keyDown = function(keyCode) {
+SIGame.prototype.keyDown = function(keyCode) {
     this.pressedKeys[keyCode] = true;
     //  Delegate to the current state too.
     if(this.currentState() && this.currentState().keyDown) {
@@ -206,18 +206,18 @@ Game.prototype.keyDown = function(keyCode) {
     }
 };
 
-Game.prototype.touchstart = function(s) {
+SIGame.prototype.touchstart = function(s) {
     if(this.currentState() && this.currentState().keyDown) {
         this.currentState().keyDown(this, KEY_SPACE);
     }    
 };
 
-Game.prototype.touchend = function(s) {
+SIGame.prototype.touchend = function(s) {
     delete this.pressedKeys[KEY_RIGHT];
     delete this.pressedKeys[KEY_LEFT];
 };
 
-Game.prototype.touchmove = function(e) {
+SIGame.prototype.touchmove = function(e) {
 	var currentX = e.changedTouches[0].pageX;
     if (this.previousX > 0) {
         if (currentX > this.previousX) {
@@ -232,7 +232,7 @@ Game.prototype.touchmove = function(e) {
 };
 
 //  Inform the game a key is up.
-Game.prototype.keyUp = function(keyCode) {
+SIGame.prototype.keyUp = function(keyCode) {
     delete this.pressedKeys[keyCode];
     //  Delegate to the current state too.
     if(this.currentState() && this.currentState().keyUp) {
