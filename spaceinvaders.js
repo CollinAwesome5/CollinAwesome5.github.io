@@ -119,7 +119,7 @@ SIGame.prototype.start = function() {
     this.moveToState(new WelcomeState());
 
     //  Set the game variables.
-    this.lives = 1000;
+    this.lives = 3;
     this.config.debugMode = /debug=true/.test(window.location.href);
 
     //  Start the game loop.
