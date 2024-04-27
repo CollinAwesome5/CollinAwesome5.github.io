@@ -24,6 +24,8 @@
     height:100%;
     z-index: -1;
     position: absolute;
+    left: 0px;
+    top: 0px;
   }
   spaceInvadersContainer {
     width: 100%;
@@ -39,12 +41,14 @@
 <body>
   
 <canvas width="400" height="400" id="game" hidden></canvas>
-<script src="./spaceinvaders.js"></script>
+
   
-<div id="starfieldContainer" hidden></div>
+<script src="./spaceinvaders.js"></script>
+<div id="starfieldContainer" hidden>
 <div id="spaceInvadersContainer" hidden>
   <canvas id="spaceInvadersCanvas"></canvas>
 </div>
+  </div>
        
 
 <script>
