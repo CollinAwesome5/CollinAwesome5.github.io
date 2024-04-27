@@ -77,7 +77,7 @@ function SIGame() {
 
 //  Initialis the Game with a canvas.
 SIGame.prototype.initialise = function(gameCanvas) {
-
+    console.log('Hello world');
     //  Set the game canvas.
     this.gameCanvas = gameCanvas;
     console.log(`Set the game canvas to: ${gameCanvas}`);
