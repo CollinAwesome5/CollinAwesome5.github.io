@@ -80,6 +80,7 @@ SIGame.prototype.initialise = function(gameCanvas) {
 
     //  Set the game canvas.
     this.gameCanvas = gameCanvas;
+    console.log(`Set the game canvas to: ${gameCanvas}`);
 
     //  Set the game width and height.
     this.width = gameCanvas.width;
