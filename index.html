@@ -40,7 +40,7 @@
 <canvas width="400" height="400" id="game" hidden></canvas>
 <script src="./spaceinvaders.js"></script>
   
-<div id="starfield" hidden></div>
+<div id="starfieldContainer" hidden></div>
 <div id="spaceInvadersContainer" hidden>
   <canvas id="spaceInvadersCanvas"></canvas>
 </div>
@@ -50,7 +50,7 @@
 
 //Space invaders game initialization
 //  Create the starfield.
-var starFieldContainer = document.getElementById('starfield');
+var starFieldContainer = document.getElementById('starfieldContainer');
 var starfield = new Starfield();
 starfield.initialise(starFieldContainer);
 starfield.start();
@@ -265,11 +265,11 @@ function setActiveGame(gameName) {
   game.hidden = true;
   inGameMenu.hidden = true;
   spaceInvadersContainer.hidden = true;
-  starfield.hidden = true;
+  starfieldContainer.hidden = true;
   
   switch (activeGame) {
     case 'none': selectGameMenu.hidden = false; break;
-    case 'spaceInvaders': spaceInvadersContainer.hidden = false; starfield.hidden = false; inGameMenu.hidden = false; break;
+    case 'spaceInvaders': spaceInvadersContainer.hidden = false; starfieldContainer.hidden = false; inGameMenu.hidden = false; break;
     case 'snakeGame': game.hidden = false; inGameMenu.hidden = false; break;
     default: selectGameMenu.hidden = false; break;
   }
