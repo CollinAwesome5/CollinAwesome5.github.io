@@ -1,4 +1,3 @@
-this.this = game;
 /*
   spaceinvaders.js
 
