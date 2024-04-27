@@ -1,4 +1,4 @@
-
+/*
 /*
   spaceinvaders.js
 
@@ -946,3 +946,4 @@ function Star(x, y, size, velocity) {
 	this.size = size;
 	this.velocity = velocity;
 }
+*/
