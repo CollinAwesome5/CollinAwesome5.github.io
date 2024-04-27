@@ -99,13 +99,13 @@ SIGame.prototype.moveToState = function(state) {
  
    //  If we are in a state, leave it.
    if(this.currentState() && this.currentState().leave) {
-     this.currentState().leave(game);
+     this.currentState().leave(siGame);
      this.stateStack.pop();
    }
    
    //  If there's an enter function for the new state, call it.
    if(state.enter) {
-     state.enter(game);
+     state.enter(siGame);
    }
  
    //  Set the current state.
@@ -124,8 +124,8 @@ SIGame.prototype.start = function() {
     this.config.debugMode = /debug=true/.test(window.location.href);
 
     //  Start the game loop.
-    var game = this;
-    this.intervalId = setInterval(function () { GameLoop(game);}, 1000 / this.config.fps);
+    var siGame = this;
+    this.intervalId = setInterval(function () { GameLoop(siGame);}, 1000 / this.config.fps);
 
 };
 
@@ -149,12 +149,12 @@ SIGame.prototype.mute = function(mute) {
 };
 
 //  The main loop.
-function GameLoop(game) {
-    var currentState = game.currentState();
+function GameLoop(siGame) {
+    var currentState = siGame.currentState();
     if(currentState) {
 
         //  Delta t is the time to update/draw.
-        var dt = 1 / game.config.fps;
+        var dt = 1 / siGame.config.fps;
 
         //  Get the drawing context.
         var ctx = this.gameCanvas.getContext("2d");
@@ -162,10 +162,10 @@ function GameLoop(game) {
         //  Update if we have an update function. Also draw
         //  if we have a draw function.
         if(currentState.update) {
-            currentState.update(game, dt);
+            currentState.update(siGame, dt);
         }
         if(currentState.draw) {
-            currentState.draw(game, dt, ctx);
+            currentState.draw(siGame, dt, ctx);
         }
     }
 }
@@ -174,7 +174,7 @@ SIGame.prototype.pushState = function(state) {
 
     //  If there's an enter function for the new state, call it.
     if(state.enter) {
-        state.enter(game);
+        state.enter(siGame);
     }
     //  Set the current state.
     this.stateStack.push(state);
@@ -185,7 +185,7 @@ SIGame.prototype.popState = function() {
     //  Leave and pop the state.
     if(this.currentState()) {
         if(this.currentState().leave) {
-            this.currentState().leave(game);
+            this.currentState().leave(siGame);
         }
 
         //  Set the current state.
@@ -245,43 +245,43 @@ function WelcomeState() {
 
 }
 
-WelcomeState.prototype.enter = function(game) {
+WelcomeState.prototype.enter = function(siGame) {
 
     // Create and load the sounds.
-    game.sounds = new Sounds();
-    game.sounds.init();
-    game.sounds.loadSound('shoot', 'sounds/sounds_shoot.wav');
-    game.sounds.loadSound('bang', 'sounds/sounds_bang.wav');
-    game.sounds.loadSound('explosion', 'sounds/sounds_explosion.wav');
+    siGame.sounds = new Sounds();
+    siGame.sounds.init();
+    siGame.sounds.loadSound('shoot', 'sounds/sounds_shoot.wav');
+    siGame.sounds.loadSound('bang', 'sounds/sounds_bang.wav');
+    siGame.sounds.loadSound('explosion', 'sounds/sounds_explosion.wav');
 };
 
-WelcomeState.prototype.update = function (game, dt) {
+WelcomeState.prototype.update = function (siGame, dt) {
 
 
 };
 
-WelcomeState.prototype.draw = function(game, dt, ctx) {
+WelcomeState.prototype.draw = function(siGame, dt, ctx) {
 
     //  Clear the background.
-    ctx.clearRect(0, 0, game.width, game.height);
+    ctx.clearRect(0, 0, siGame.width, siGame.height);
 
     ctx.font="30px Arial";
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="middle"; 
     ctx.textAlign="center"; 
-    ctx.fillText("Space Invaders", game.width / 2, game.height/2 - 40); 
+    ctx.fillText("Space Invaders", siGame.width / 2, siGame.height/2 - 40); 
     ctx.font="16px Arial";
 
-    ctx.fillText("Press 'Space' or touch to start.", game.width / 2, game.height/2); 
+    ctx.fillText("Press 'Space' or touch to start.", siGame.width / 2, siGame.height/2); 
 };
 
-WelcomeState.prototype.keyDown = function(game, keyCode) {
+WelcomeState.prototype.keyDown = function(siGame, keyCode) {
     if(keyCode == KEY_SPACE) {
         //  Space starts the game.
-        game.level = 1;
-        game.score = 0;
-        game.lives = 3;
-        game.moveToState(new LevelIntroState(game.level));
+        siGame.level = 1;
+        siGame.score = 0;
+        siGame.lives = 3;
+        siGame.moveToState(new LevelIntroState(siGame.level));
     }
 };
 
@@ -289,33 +289,33 @@ function GameOverState() {
 
 }
 
-GameOverState.prototype.update = function(game, dt) {
+GameOverState.prototype.update = function(siGame, dt) {
 
 };
 
-GameOverState.prototype.draw = function(game, dt, ctx) {
+GameOverState.prototype.draw = function(siGame, dt, ctx) {
 
     //  Clear the background.
-    ctx.clearRect(0, 0, game.width, game.height);
+    ctx.clearRect(0, 0, siGame.width, siGame.height);
 
     ctx.font="30px Arial";
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="center"; 
     ctx.textAlign="center"; 
-    ctx.fillText("Game Over!", game.width / 2, game.height/2 - 40); 
+    ctx.fillText("Game Over!", siGame.width / 2, siGame.height/2 - 40); 
     ctx.font="16px Arial";
-    ctx.fillText("You scored " + game.score + " and got to level " + game.level, game.width / 2, game.height/2);
+    ctx.fillText("You scored " + siGame.score + " and got to level " + siGame.level, siGame.width / 2, siGame.height/2);
     ctx.font="16px Arial";
-    ctx.fillText("Press 'Space' to play again.", game.width / 2, game.height/2 + 40);   
+    ctx.fillText("Press 'Space' to play again.", siGame.width / 2, siGame.height/2 + 40);   
 };
 
-GameOverState.prototype.keyDown = function(game, keyCode) {
+GameOverState.prototype.keyDown = function(siGame, keyCode) {
     if(keyCode == KEY_SPACE) {
         //  Space restarts the game.
-        game.lives = 3;
-        game.score = 0;
-        game.level = 1;
-        game.moveToState(new LevelIntroState(1));
+        siGame.lives = 3;
+        siGame.score = 0;
+        siGame.level = 1;
+        siGame.moveToState(new LevelIntroState(1));
     }
 };
 
@@ -337,10 +337,10 @@ function PlayState(config, level) {
     this.bombs = [];
 }
 
-PlayState.prototype.enter = function(game) {
+PlayState.prototype.enter = function(siGame) {
 
     //  Create the ship.
-    this.ship = new Ship(game.width / 2, game.gameBounds.bottom);
+    this.ship = new Ship(siGame.width / 2, siGame.gameBounds.bottom);
 
     //  Setup initial state.
     this.invaderCurrentVelocity =  10;
@@ -364,8 +364,8 @@ PlayState.prototype.enter = function(game) {
     for(var rank = 0; rank < ranks; rank++){
         for(var file = 0; file < files; file++) {
             invaders.push(new Invader(
-                (game.width / 2) + ((files/2 - file) * 200 / files),
-                (game.gameBounds.top + rank * 20),
+                (siGame.width / 2) + ((files/2 - file) * 200 / files),
+                (siGame.gameBounds.top + rank * 20),
                 rank, file, 'Invader'));
         }
     }
@@ -375,28 +375,28 @@ PlayState.prototype.enter = function(game) {
     this.invaderNextVelocity = null;
 };
 
-PlayState.prototype.update = function(game, dt) {
+PlayState.prototype.update = function(siGame, dt) {
     
     //  If the left or right arrow keys are pressed, move
     //  the ship. Check this on ticks rather than via a keydown
     //  event for smooth movement, otherwise the ship would move
     //  more like a text editor caret.
-    if(game.pressedKeys[KEY_LEFT]) {
+    if(siGame.pressedKeys[KEY_LEFT]) {
         this.ship.x -= this.shipSpeed * dt;
     }
-    if(game.pressedKeys[KEY_RIGHT]) {
+    if(siGame.pressedKeys[KEY_RIGHT]) {
         this.ship.x += this.shipSpeed * dt;
     }
-    if(game.pressedKeys[KEY_SPACE]) {
+    if(siGame.pressedKeys[KEY_SPACE]) {
         this.fireRocket();
     }
 
     //  Keep the ship in bounds.
-    if(this.ship.x < game.gameBounds.left) {
-        this.ship.x = game.gameBounds.left;
+    if(this.ship.x < siGame.gameBounds.left) {
+        this.ship.x = siGame.gameBounds.left;
     }
-    if(this.ship.x > game.gameBounds.right) {
-        this.ship.x = game.gameBounds.right;
+    if(this.ship.x > siGame.gameBounds.right) {
+        this.ship.x = siGame.gameBounds.right;
     }
 
     //  Move each bomb.
@@ -427,13 +427,13 @@ PlayState.prototype.update = function(game, dt) {
         var invader = this.invaders[i];
         var newx = invader.x + this.invaderVelocity.x * dt;
         var newy = invader.y + this.invaderVelocity.y * dt;
-        if(hitLeft == false && newx < game.gameBounds.left) {
+        if(hitLeft == false && newx < siGame.gameBounds.left) {
             hitLeft = true;
         }
-        else if(hitRight == false && newx > game.gameBounds.right) {
+        else if(hitRight == false && newx > siGame.gameBounds.right) {
             hitRight = true;
         }
-        else if(hitBottom == false && newy > game.gameBounds.bottom) {
+        else if(hitBottom == false && newy > siGame.gameBounds.bottom) {
             hitBottom = true;
         }
 
@@ -468,7 +468,7 @@ PlayState.prototype.update = function(game, dt) {
     }
     //  If we've hit the bottom, it's game over.
     if(hitBottom) {
-        game.lives = 0;
+        siGame.lives = 0;
     }
     
     //  Check for rocket/invader collisions.
@@ -486,13 +486,13 @@ PlayState.prototype.update = function(game, dt) {
                 //  this rocket again.
                 this.rockets.splice(j--, 1);
                 bang = true;
-                game.score += this.config.pointsPerInvader;
+                siGame.score += this.config.pointsPerInvader;
                 break;
             }
         }
         if(bang) {
             this.invaders.splice(i--, 1);
-            game.sounds.playSound('bang');
+            siGame.sounds.playSound('bang');
         }
     }
 
@@ -526,8 +526,8 @@ PlayState.prototype.update = function(game, dt) {
         if(bomb.x >= (this.ship.x - this.ship.width/2) && bomb.x <= (this.ship.x + this.ship.width/2) &&
                 bomb.y >= (this.ship.y - this.ship.height/2) && bomb.y <= (this.ship.y + this.ship.height/2)) {
             this.bombs.splice(i--, 1);
-            game.lives--;
-            game.sounds.playSound('explosion');
+            siGame.lives--;
+            siGame.sounds.playSound('explosion');
         }
                 
     }
@@ -540,28 +540,28 @@ PlayState.prototype.update = function(game, dt) {
             (invader.y + invader.height/2) > (this.ship.y - this.ship.height/2) &&
             (invader.y - invader.height/2) < (this.ship.y + this.ship.height/2)) {
             //  Dead by collision!
-            game.lives = 0;
-            game.sounds.playSound('explosion');
+            siGame.lives = 0;
+            siGame.sounds.playSound('explosion');
         }
     }
 
     //  Check for failure
-    if(game.lives <= 0) {
-        game.moveToState(new GameOverState());
+    if(siGame.lives <= 0) {
+        siGame.moveToState(new GameOverState());
     }
 
     //  Check for victory
     if(this.invaders.length === 0) {
-        game.score += this.level * 50;
-        game.level += 1;
-        game.moveToState(new LevelIntroState(game.level));
+        siGame.score += this.level * 50;
+        siGame.level += 1;
+        siGame.moveToState(new LevelIntroState(siGame.level));
     }
 };
 
-PlayState.prototype.draw = function(game, dt, ctx) {
+PlayState.prototype.draw = function(siGame, dt, ctx) {
 
     //  Clear the background.
-    ctx.clearRect(0, 0, game.width, game.height);
+    ctx.clearRect(0, 0, siGame.width, siGame.height);
     
     //  Draw ship.
     ctx.fillStyle = '#999999';
@@ -589,28 +589,28 @@ PlayState.prototype.draw = function(game, dt, ctx) {
     }
 
     //  Draw info.
-    var textYpos = game.gameBounds.bottom + ((game.height - game.gameBounds.bottom) / 2) + 14/2;
+    var textYpos = siGame.gameBounds.bottom + ((siGame.height - siGame.gameBounds.bottom) / 2) + 14/2;
     ctx.font="14px Arial";
     ctx.fillStyle = '#ffffff';
-    var info = "Lives: " + game.lives;
+    var info = "Lives: " + siGame.lives;
     ctx.textAlign = "left";
-    ctx.fillText(info, game.gameBounds.left, textYpos);
-    info = "Score: " + game.score + ", Level: " + game.level;
+    ctx.fillText(info, siGame.gameBounds.left, textYpos);
+    info = "Score: " + siGame.score + ", Level: " + siGame.level;
     ctx.textAlign = "right";
-    ctx.fillText(info, game.gameBounds.right, textYpos);
+    ctx.fillText(info, siGame.gameBounds.right, textYpos);
 
     //  If we're in debug mode, draw bounds.
     if(this.config.debugMode) {
         ctx.strokeStyle = '#ff0000';
-        ctx.strokeRect(0,0,game.width, game.height);
-        ctx.strokeRect(game.gameBounds.left, game.gameBounds.top,
-            game.gameBounds.right - game.gameBounds.left,
-            game.gameBounds.bottom - game.gameBounds.top);
+        ctx.strokeRect(0,0,siGame.width, siGame.height);
+        ctx.strokeRect(siGame.gameBounds.left, siGame.gameBounds.top,
+            siGame.gameBounds.right - siGame.gameBounds.left,
+            siGame.gameBounds.bottom - siGame.gameBounds.top);
     }
 
 };
 
-PlayState.prototype.keyDown = function(game, keyCode) {
+PlayState.prototype.keyDown = function(siGame, keyCode) {
 
     if(keyCode == KEY_SPACE) {
         //  Fire!
@@ -618,11 +618,11 @@ PlayState.prototype.keyDown = function(game, keyCode) {
     }
     if(keyCode == 80) {
         //  Push the pause state.
-        game.pushState(new PauseState());
+        siGame.pushState(new PauseState());
     }
 };
 
-PlayState.prototype.keyUp = function(game, keyCode) {
+PlayState.prototype.keyUp = function(siGame, keyCode) {
 
 };
 
@@ -636,7 +636,7 @@ PlayState.prototype.fireRocket = function() {
         this.lastRocketTime = (new Date()).valueOf();
 
         //  Play the 'shoot' sound.
-        game.sounds.playSound('shoot');
+        siGame.sounds.playSound('shoot');
     }
 };
 
@@ -644,24 +644,24 @@ function PauseState() {
 
 }
 
-PauseState.prototype.keyDown = function(game, keyCode) {
+PauseState.prototype.keyDown = function(siGame, keyCode) {
 
     if(keyCode == 80) {
         //  Pop the pause state.
-        game.popState();
+        siGame.popState();
     }
 };
 
-PauseState.prototype.draw = function(game, dt, ctx) {
+PauseState.prototype.draw = function(siGame, dt, ctx) {
 
     //  Clear the background.
-    ctx.clearRect(0, 0, game.width, game.height);
+    ctx.clearRect(0, 0, siGame.width, siGame.height);
 
     ctx.font="14px Arial";
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="middle";
     ctx.textAlign="center";
-    ctx.fillText("Paused", game.width / 2, game.height/2);
+    ctx.fillText("Paused", siGame.width / 2, siGame.height/2);
     return;
 };
 
@@ -676,7 +676,7 @@ function LevelIntroState(level) {
     this.countdownMessage = "3";
 }
 
-LevelIntroState.prototype.update = function(game, dt) {
+LevelIntroState.prototype.update = function(siGame, dt) {
 
     //  Update the countdown.
     if(this.countdown === undefined) {
@@ -692,23 +692,23 @@ LevelIntroState.prototype.update = function(game, dt) {
     } 
     if(this.countdown <= 0) {
         //  Move to the next level, popping this state.
-        game.moveToState(new PlayState(game.config, this.level));
+        siGame.moveToState(new PlayState(siGame.config, this.level));
     }
 
 };
 
-LevelIntroState.prototype.draw = function(game, dt, ctx) {
+LevelIntroState.prototype.draw = function(siGame, dt, ctx) {
 
     //  Clear the background.
-    ctx.clearRect(0, 0, game.width, game.height);
+    ctx.clearRect(0, 0, siGame.width, siGame.height);
 
     ctx.font="36px Arial";
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="middle"; 
     ctx.textAlign="center"; 
-    ctx.fillText("Level " + this.level, game.width / 2, game.height/2);
+    ctx.fillText("Level " + this.level, siGame.width / 2, siGame.height/2);
     ctx.font="24px Arial";
-    ctx.fillText("Ready in " + this.countdownMessage, game.width / 2, game.height/2 + 36);      
+    ctx.fillText("Ready in " + this.countdownMessage, siGame.width / 2, siGame.height/2 + 36);      
     return;
 };
 
