@@ -13,9 +13,13 @@
     margin: 0;
   }
 
-  #insideBody {
+  insideBody {
     background: black;
     display: flex;
+    position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -46,7 +50,6 @@
   
 <canvas width="400" height="400" id="game" hidden></canvas>
 
-  
 <script src="./spaceinvaders.js"></script>
 
 <div id="spaceInvadersContainer" hidden>
