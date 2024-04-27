@@ -1,4 +1,4 @@
-/*
+
 /*
   spaceinvaders.js
 
@@ -21,7 +21,7 @@
     Listen for 'gameWon' or 'gameLost' events to handle the game
     ending.
 */
-
+/*
 //  Constants for the keyboard.
 var KEY_LEFT = 37;
 var KEY_RIGHT = 39;
