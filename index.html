@@ -9,52 +9,77 @@
     height: 100%; 
     width: 100%;
     margin: 0;
-      overflow: hidden;
   }
 
-  insideBody {
+  .insideBody {
     width: 100%;
     height: 100%;
-    display: flex;
     position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: 2;
+      display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
     
   canvas {
-    border: 1px solid black;
+    border: 1px solid white;
   }
     
-  starfieldContainer {
-   position: absolute; 
-    left: 0; 
-    top: 0; 
-    z-index: -1;
-  }
-  spaceInvadersContainer {
+  .starfieldContainerType {
+    background: blue;
     width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0; 
+    z-index: 1;
+  }
+  .spaceInvadersContainer {
+    width: 800px;
     margin-left: auto;
     margin-right: auto;
+    z-index: 2;
   }
-  spaceInvadersCanvas { 
+  .spaceInvadersCanvas {
     width: 800px;
     height: 600px;
+  }
+  .selectGameMenu {
+      background: black;
+      z-index: 2;
   }
   </style>
 </head>
   
 <body>
   
- <div id="starfieldContainer" hidden></div>
+<div id="starfieldContainer" class="starfieldContainerType"></div>
   
-<div id="insideBody">
+<div class="insideBody">
   <canvas width="400" height="400" id="game" hidden></canvas>  
-  <div id="spaceInvadersContainer" hidden>
+  <div id="spaceInvadersContainer" class="spaceInvadersContainer" hidden>
     <canvas id="spaceInvadersCanvas"></canvas>
+  </div>
+  
+  <div id="selectGameMenu" class="selectGameMenu">
+   <h1 style="color: white;">The Cool Website</h1>
+  <p style="color: white;">more games coming soon</p>
+   <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
+     <a href="https://docs.google.com/forms/d/1dzACEd2ZKxXvyS8v2MlMwBt2Irn7aT0kOrBCjdN2pn0/edit">do this form for more games</a><br><br>
+   <input type="button" value="Snake Game" onclick="setActiveGame('snakeGame');" />
+   <input type="button" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
+   </p>
+   <br>
+  </div>
+
+  <div id="inGameMenu" hidden class="selectGameMenu">
+   <h1 style="color: white;">The Cool Website</h1>
+   <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
+   <input type="button" value="Menu" onclick="setActiveGame('none');" />
+   <br>
   </div>
 </div>
        
@@ -278,37 +303,29 @@ function setActiveGame(gameName) {
   game.hidden = true;
   inGameMenu.hidden = true;
   spaceInvadersContainer.hidden = true;
-  starfieldContainer.hidden = true;
+  //starfieldContainer.hidden = true;
   
   switch (activeGame) {
-    case 'none': selectGameMenu.hidden = false; break;
-    case 'spaceInvaders': spaceInvadersContainer.hidden = false; starfieldContainer.hidden = false; inGameMenu.hidden = false; break;
-    case 'snakeGame': game.hidden = false; inGameMenu.hidden = false; break;
-    default: selectGameMenu.hidden = false; break;
+    case 'none':
+      selectGameMenu.hidden = false;
+      break;
+    case 'spaceInvaders':
+      spaceInvadersContainer.hidden = false;
+      inGameMenu.hidden = false;
+      break;
+    case 'snakeGame':
+      game.hidden = false;
+      inGameMenu.hidden = false;
+      break;
+    default:
+      selectGameMenu.hidden = false;
+      break;
   }
 }
   
 requestAnimationFrame(loop);
   
 </script>
-<div id="selectGameMenu">
-  <h1 style="color: white;">The Cool Website</h1>
- <p style="color: white;">more games coming soon</p>
-  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-    <a href="https://docs.google.com/forms/d/1dzACEd2ZKxXvyS8v2MlMwBt2Irn7aT0kOrBCjdN2pn0/edit">do this form for more games</a><br><br>
-  <input type="button" value="Snake Game" onclick="setActiveGame('snakeGame');" />
-  <input type="button" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
-  </p>
-  <br>
-</div>
-<div id="inGameMenu" hidden>
-  <h1 style="color: white;">The Cool Website</h1>
-  <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-  <input type="button" value="Menu" onclick="setActiveGame('none');" />
-  <br>
-</div>
     
 </body>
 </html>
-
-
