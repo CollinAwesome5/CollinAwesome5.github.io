@@ -31,7 +31,7 @@ function SIGame() {
 
     //  Set the initial config.
     this.config = {
-        bombRate: 100,
+        bombRate: 0.05,
         bombMinVelocity: 50,
         bombMaxVelocity: 50,
         invaderInitialVelocity: 25,
@@ -47,12 +47,12 @@ function SIGame() {
         invaderFiles: 10,
         shipSpeed: 120,
         levelDifficultyMultiplier: 0.2,
-        pointsPerInvader: 1,
+        pointsPerInvader: 5,
         limitLevelIncrease: 25
     };
 
     //  All state is in the variables below.
-    this.lives = 1;
+    this.lives = 3;
     this.width = 0;
     this.height = 0;
     this.gameBounds = {left: 0, top: 0, right: 0, bottom: 0};
