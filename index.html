@@ -12,7 +12,7 @@
       overflow: hidden;
   }
 
-  insideBody {
+  .insideBody {
     width: 100%;
     height: 100%;
     background: red;
@@ -29,32 +29,32 @@
   canvas {
     border: 1px solid black;
   }
-  starfieldContainer {
+  .starfieldContainer {
    position: absolute; 
     left: 0; 
     top: 0; 
     z-index: -1;
   }
-  spaceInvadersContainer {
+  .spaceInvadersContainer {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
   }
-  spaceInvadersCanvas { 
+  .spaceInvadersCanvas { 
     width: 800px;
     height: 600px;
   }
   </style>
 </head>
 <body>
-<div id="starfieldContainer" hidden></div>
-<div id="insideBody">
+<div class="starfieldContainer" hidden></div>
+<div class="insideBody">
   
 <canvas width="400" height="400" id="game" hidden></canvas>
 
 <script src="./spaceinvaders.js"></script>
 
-<div id="spaceInvadersContainer" hidden>
+<div class="spaceInvadersContainer" hidden>
   <canvas id="spaceInvadersCanvas"></canvas>
 </div>
 </div>
