@@ -167,9 +167,9 @@ var apple = {
   y: 320
 };
 
-var snakeSounds = new Sounds();
-snakeSounds.init();
-snakeSounds.loadSound('eat', 'sounds/sounds_shoot.wav');
+//var snakeSounds = new Sounds();
+//snakeSounds.init();
+//snakeSounds.loadSound('eat', 'sounds/sounds_shoot.wav');
 
 // get random whole numbers in a specific range
 // @see https://stackoverflow.com/a/1527820/2124254
@@ -231,7 +231,7 @@ function loop() {
     if (cell.x === apple.x && cell.y === apple.y) {
       snake.maxCells++;
 
-      snakeSounds.playSound('eat');
+      //snakeSounds.playSound('eat');
 
       // canvas is 400x400 which is 25x25 grids 
       apple.x = getRandomInt(0, 25) * grid;
