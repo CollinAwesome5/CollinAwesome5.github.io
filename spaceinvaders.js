@@ -870,11 +870,11 @@ Starfield.prototype.initialise = function(div) {
 	//	Store the div.
 	this.containerDiv = div;
 	self.width = window.innerWidth;
-	self.height = window.innerHeight;
+	self.height = window.innerHeight * 0.5;
 
 	window.onresize = function(event) {
 		self.width = window.innerWidth;
-		self.height = window.innerHeight;
+		self.height = window.innerHeight * 0.5;
 		self.canvas.width = self.width;
 		self.canvas.height = self.height;
 		self.draw();
