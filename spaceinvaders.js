@@ -76,10 +76,10 @@ function SIGame() {
 
 //  Initialis the Game with a canvas.
 SIGame.prototype.initialise = function(gameCanvas) {
-    console.log('Hello world');
+    //console.log('Hello world');
     //  Set the game canvas.
     this.gameCanvas = gameCanvas;
-    console.log(`Set the game canvas to: ${this.gameCanvas}`);
+    //console.log(`Set the game canvas to: ${this.gameCanvas}`);
 
     //  Set the game width and height.
     this.width = gameCanvas.width;
@@ -156,8 +156,8 @@ function GameLoop(siGame) {
         var dt = 1 / siGame.config.fps;
 
         //  Get the drawing context.
-        console.log(`siGame.gameCanvas = ${siGame.gameCanvas}`);
-	console.log(siGame);
+        //console.log(`siGame.gameCanvas = ${siGame.gameCanvas}`);
+	//console.log(siGame);
 	var ctx = siGame.gameCanvas.getContext("2d");
         
         //  Update if we have an update function. Also draw
