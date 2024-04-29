@@ -31,7 +31,7 @@ function SIGame() {
 
     //  Set the initial config.
     this.config = {
-        bombRate: 0.05,
+        bombRate: 100,
         bombMinVelocity: 50,
         bombMaxVelocity: 50,
         invaderInitialVelocity: 25,
@@ -52,7 +52,7 @@ function SIGame() {
     };
 
     //  All state is in the variables below.
-    this.lives = 3;
+    this.lives = 10;
     this.width = 0;
     this.height = 0;
     this.gameBounds = {left: 0, top: 0, right: 0, bottom: 0};
