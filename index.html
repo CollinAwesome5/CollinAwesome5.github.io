@@ -38,6 +38,7 @@
   }
   .spaceInvadersContainer {
     width: 100%;
+    height: 400px;
     margin-left: auto;
     margin-right: auto;
     z-index: 2;
@@ -45,12 +46,6 @@
   .spaceInvadersCanvas {
     width: 100%;
     height: 100%;
-     left: 0;
-    top: 0; 
-     display: flex;
-    flex-direction: column;
-  align-items: center;
- justify-content: center;
   }
   .selectGameMenu {
       background: black;
@@ -66,7 +61,7 @@
 <div class="insideBody">
   <canvas width="400" height="400" id="game" hidden></canvas>  
   <div id="spaceInvadersContainer" class="spaceInvadersContainer" hidden>
-    <canvas id="spaceInvadersCanvas"></canvas>
+    <canvas id="spaceInvadersCanvas" class="spaceInvadersCanvas"></canvas>
   </div>
   
   <div id="selectGameMenu" class="selectGameMenu">
