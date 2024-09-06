@@ -18,6 +18,7 @@ var ball = {
 var simWidth, simHeight, cScale;
 
 function resizeCanvas() {
+    console.log('resizing canvas');
     canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 100;
     updateScale();
