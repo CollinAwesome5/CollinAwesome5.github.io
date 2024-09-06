@@ -1,7 +1,7 @@
 var canvas = document.getElementById("pinballCanvas");
 var c = canvas.getContext("2d");
 
-var gravity = { x: 0.0, y: -10.0 }; 
+var gravity = { x: 0.0, y: -5.0 }; 
 var friction = 0.75; 
 
 var px = document.getElementById("physics-x");
@@ -11,7 +11,7 @@ var timeStep = 1.0 / 60.0;
 
 var ball = { 
     radius: 0.9,
-    pos: { x: 0.5, y: 10.5 },
+    pos: { x: 0.5, y: 20.0 },
     vel: { x: 40.0, y: 0.0 }
 };
 
@@ -20,6 +20,7 @@ var simWidth, simHeight, cScale;
 function resizeCanvas() {
     canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 20;
+    console.log(`Resized to: ${canvas.width} by ${canvas.height}`);
     updateScale();
 }
 
@@ -28,6 +29,7 @@ function updateScale() {
     cScale = Math.min(canvas.width, canvas.height) / simMinWidth;
     simWidth = canvas.width / cScale;
     simHeight = canvas.height / cScale;
+    console.log(`Sim dimmension: width: ${simWidth}, height: ${simHeight}`);
 }
 
 function cX(pos) {
@@ -40,7 +42,10 @@ function cY(pos) {
 
 function draw() {
     c.clearRect(0, 0, canvas.width, canvas.height);
+    //c.fillStyle = "green";
+    //c.fillRect(0, 0, canvas.width, canvas.height);
 
+    //c.drawRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#FF0000";
     c.beginPath();
     c.arc(
@@ -117,5 +122,6 @@ function update() {
 }
 
 window.addEventListener('resize', resizeCanvas);
+window.addEventListener('click', resizeCanvas); //Any click event...
 resizeCanvas();
 update();
