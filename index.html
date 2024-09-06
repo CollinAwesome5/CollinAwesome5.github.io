@@ -47,6 +47,17 @@
     width: 100%;
     height: 100%;
   }
+    .pinballContainer {
+    width: 400px;
+    height: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 2;
+  }
+  .pinballCanvas {
+    width: 100%;
+    height: 100%;
+  }
   .selectGameMenu {
       background: black;
       z-index: 2;
@@ -89,6 +100,7 @@
 </div>
        
 <script src="./spaceinvaders.js"></script>
+<script src="./pinball.js"></script>
 <script>
 
 //  Space invaders game initialization
@@ -331,7 +343,8 @@ function setActiveGame(gameName) {
       inGameMenu.hidden = false;
       break;
     case 'pinballGame':
-            inGameMenu.hidden = false;
+      inGameMenu.hidden = false;
+      pinballContainer.hiddin = false;
       break;
     default:
       selectGameMenu.hidden = false;
