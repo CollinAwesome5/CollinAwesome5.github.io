@@ -1,4 +1,4 @@
-var canvas = document.getElementById("canvas");
+var canvas = document.getElementById("pinballCanvas");
 var c = canvas.getContext("2d");
 
 var gravity = { x: 0.0, y: -10.0 }; 
