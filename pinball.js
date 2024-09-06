@@ -39,7 +39,7 @@ function cY(pos) {
 }
 
 function draw() {
-    c.clearRect(0, 0, canvas.width/cScale, canvas.height/cScale);
+    c.clearRect(0, 0, canvas.width, canvas.height);
 
     c.fillStyle = "#FF0000";
     c.beginPath();
