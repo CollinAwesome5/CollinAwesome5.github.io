@@ -25,9 +25,9 @@ function resizeCanvas() {
 
 function updateScale() {
     var simMinWidth = 20.0;
-    cScale = Math.min(canvas.width, canvas.height) / simMinWidth;
-    simWidth = canvas.width / cScale;
-    simHeight = canvas.height / cScale;
+    cScale = 1;//Math.min(canvas.width, canvas.height) / simMinWidth;
+    simWidth = canvas.width;// / cScale;
+    simHeight = canvas.height;// / cScale;
 }
 
 function cX(pos) {
