@@ -9,7 +9,7 @@ var py = document.getElementById("physics-y");
 
 var timeStep = 1.0 / 60.0;
 
-var ball = {
+var ball = { 
     radius: 0.9,
     pos: { x: 0.5, y: 10.5 },
     vel: { x: 40.0, y: 0.0 }
