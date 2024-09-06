@@ -18,16 +18,16 @@ var ball = {
 var simWidth, simHeight, cScale;
 
 function resizeCanvas() {
-    canvas.width = 400; //window.innerWidth - 20;
-    canvas.height = 700; //window.innerHeight - 20;
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 20;
     updateScale();
 }
 
 function updateScale() {
     var simMinWidth = 20.0;
-    cScale = 1;//Math.min(canvas.width, canvas.height) / simMinWidth;
-    simWidth = canvas.width;// / cScale;
-    simHeight = canvas.height;// / cScale;
+    cScale = Math.min(canvas.width, canvas.height) / simMinWidth;
+    simWidth = canvas.width / cScale;
+    simHeight = canvas.height / cScale;
 }
 
 function cX(pos) {
