@@ -10,7 +10,7 @@ var py = document.getElementById("physics-y");
 var timeStep = 1.0 / 60.0;
 
 var ball = { 
-    radius: 0.9,
+    radius: 0.5,
     pos: { x: 0.5, y: 20.0 },
     vel: { x: 40.0, y: 0.0 }
 };
@@ -42,11 +42,13 @@ function cY(pos) {
 
 function draw() {
     c.clearRect(0, 0, canvas.width, canvas.height);
+    c.strokeStyle = "#FFFFFF";
+    c.strokeRect(0, 0, canvas.width, canvas.height);
     //c.fillStyle = "green";
     //c.fillRect(0, 0, canvas.width, canvas.height);
 
     //c.drawRect(0, 0, canvas.width, canvas.height);
-    c.fillStyle = "#FF0000";
+    c.fillStyle = "#d0d0d0";
     c.beginPath();
     c.arc(
         cX(ball.pos), cY(ball.pos), cScale * ball.radius, 0.0, 2.0 * Math.PI
