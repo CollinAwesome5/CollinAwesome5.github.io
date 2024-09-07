@@ -2,7 +2,7 @@ var canvas = document.getElementById("pinballCanvas");
 var c = canvas.getContext("2d");
 
 var gravity = { x: 0.0, y: -5.0 }; 
-var friction = 0.75; 
+var friction = 0.80; 
 
 var px = document.getElementById("physics-x");
 var py = document.getElementById("physics-y");
@@ -18,6 +18,8 @@ var ball = {
 var simWidth, simHeight, cScale;
 
 function resizeCanvas() {
+    c.clearRect(0, 0, canvas.width+1, canvas.height+1);
+    
     canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 20;
     console.log(`Resized to: ${canvas.width} by ${canvas.height}`);
