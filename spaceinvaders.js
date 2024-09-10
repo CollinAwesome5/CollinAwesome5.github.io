@@ -31,7 +31,7 @@ function SIGame() {
 
     //  Set the initial config.
     this.config = {
-        bombRate: 100,
+        bombRate: 99.99,
         bombMinVelocity: 50,
         bombMaxVelocity: 50,
         invaderInitialVelocity: 25,
