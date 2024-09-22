@@ -171,10 +171,10 @@ class Collision {
 function resizeCanvas() {
     c.clearRect(0, 0, canvas.width+1, canvas.height+1);
     
-    canvas.width = window.innerWidth - 20;
+    /*canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 20;
     console.log(`Resized to: ${canvas.width} by ${canvas.height}`);
-    updateScale();
+    updateScale();*/
 }
 
 function updateScale() {
