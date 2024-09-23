@@ -2,7 +2,8 @@ var canvas = document.getElementById("pinballCanvas");
 var c = canvas.getContext("2d");
 
 var gravity = { x: 0.0, y: -5.0 }; 
-var friction = 1.0; 
+var friction = 0.8; 
+var holdCycles = 0;
 
 var px = document.getElementById("physics-x");
 var py = document.getElementById("physics-y");
@@ -76,24 +77,35 @@ class PointObject {
         this.friction = 0.75;
         this.lastContactTime = new Date(0, 0, 0);
         this.color = "#0000FF";
+        this.bounceStrength = 1.4;
     }
 
     draw(c, ball) {
-        c.strokeStyle = "#FFFFFF";
+
+        var radiusScaler = 1.0;
+        if ((this.bounceStrength > 1.0) && ((new Date() - this.lastContactTime) < 200)) {
+            c.strokeStyle = "#FF0000";
+            c.fillStyle = "#FF0000";
+            radiusScaler = 1.1;
+        } else {
+            c.strokeStyle = "#8F8F8F";
+            c.fillStyle = "#8F8F8F";
+        }
+
         c.beginPath();
-        c.arc(cX(this), cY(this), cScale * this.radius, 0.0, 2.0 * Math.PI);
+        c.arc(cX(this), cY(this), cScale * this.radius*radiusScaler, 0.0, 2.0 * Math.PI);
         c.closePath();
         c.fill();
 
         if (ball) {
-            const dist = Math.sqrt(Math.pow(this.x - ball.pos.x, 2) + Math.pow(this.y - ball.pos.y, 2));
+            /*const dist = Math.sqrt(Math.pow(this.x - ball.pos.x, 2) + Math.pow(this.y - ball.pos.y, 2));
             c.strokeStyle = '#FF0000';
             c.font = "16px serif";
             c.lineWidth = 1;
             c.strokeText(`Ball dist: ${dist}`, cX(this), cY(this));
-            c.closePath();
+            c.closePath();*/
 
-            
+            /*
             const xa = this.x;
             const ya = this.y;
             const x2 = ball.pos.x - ball.vel.x * timeStep;
@@ -104,8 +116,8 @@ class PointObject {
             c.strokeStyle = "#3FFF5F";
             c.beginPath();
             c.moveTo(cX({x:0}), cY({y:m*0+b}));
-            c.lineTo(cX({x:30}), cY({y:m*30+b}));
-            c.stroke();
+            c.lineTo(cX({x:simWidth}), cY({y:m*simWidth+b}));
+            c.stroke();*/
         }
     }
 
@@ -120,31 +132,60 @@ class PointObject {
             const m=(ball.pos.y - y2) / (ball.pos.x - x2);
             const b=y2-m*x2;
             const di = ball.radius + this.radius;
-            const yab = ya + b;
+            const yab = ya - b;
             
             //quadratic
-            const qa = 1+m*m;
-            const qb = -2*(xa+m*(ya+b));
-            const qc = xa*xa + yab*yab - di*di;
-            const quadC = Math.sqrt(qb*qb - 4*qa*qc);
+            const qa = (m*m) + 1;
+            const qb = -2*(xa + yab*m);
+            const qc = (xa*xa) + (yab*yab) - (di*di);
+            const quadC = Math.sqrt((qb*qb) - 4*qa*qc);
             const solX1 = (-qb + quadC)/(2*qa);
             const solX2 = (-qb - quadC)/(2*qa);
             
             var collisionX = solX1;
-            if (((solX1 < x2) && (solX1 < xa)) || ((solX1 > x2) && (solX1 > xa)))
+            if (((collisionX < x2) && (collisionX < xa)) || ((collisionX > x2) && (collisionX > xa)))
                 collisionX = solX2;
+            if (((collisionX < x2) && (collisionX < xa)) || ((collisionX > x2) && (collisionX > xa)))
+                return;
             const collisionY = m*collisionX + b;
+            this.lastContactTime = new Date();
 
-            console.log(`c: ${qc}`);
+            ball.pos.x = collisionX;
+            ball.pos.y = collisionY;
+            
+            const radiusRatio = ball.radius / (ball.radius + this.radius);
+            const impactX = collisionX + (this.x - collisionX) * radiusRatio;
+            const impactY = collisionY + (this.y - collisionY) * radiusRatio;
+            var impactNormX = impactX - collisionX;
+            var impactNormY = impactY - collisionY;
+            const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
+            impactNormX = impactNormX / impactVecLen;
+            impactNormY = impactNormY / impactVecLen;
+            const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
+            ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength;
+            ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength;
+
+            if (!isNaN(collisionX))
+                holdCycles = 0;
+
+            /*console.log(`ac: ${qc}`);
             console.log(`m: ${m}, b: ${b}`);
             console.log(`Xa: ${xa}, Ya: ${ya}, Di: ${di}`);
             console.log(`qa: ${Math.round(qa)}, qb: ${Math.round(qb)}, qc: ${Math.round(qc)}`);
             console.log(`Collision x: ${collisionX}, y: ${collisionY}`);
+            console.log(`Impact norm: (${impactNormX}, ${impactNormY})`);
+            console.log(`b2 - 4ac: (${qb*qb}) - 4(${qa}*${qc}) = ${qb*qb - 4*qa*qc}`);
+*/
 
-            collisions.push(new Collision(ball.pos.x, ball.pos.y, "#FF00FF"));
-            collisions.push(new Collision(collisionX, collisionY, "#0000FF"));
-            if (collisions.length > 5000) {
-                collisions.shift();
+            if (isNaN(collisionX)) exit(1);
+
+            //collisions.push(new Collision(ball.pos.x, ball.pos.y, "#FF00FF"));
+            
+            //if (!isNaN(collisionX)) {
+                //collisions.push(new Collision(collisionX, collisionY, "#0000FF"));
+                //collisions.push(new Collision(impactX, impactY, "#FFDFFF"));
+            //}
+            while (collisions.length > 2500) {
                 collisions.shift();
             }
         }  
@@ -171,10 +212,10 @@ class Collision {
 function resizeCanvas() {
     c.clearRect(0, 0, canvas.width+1, canvas.height+1);
     
-    /*canvas.width = window.innerWidth - 20;
+    canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 20;
     console.log(`Resized to: ${canvas.width} by ${canvas.height}`);
-    updateScale();*/
+    updateScale();
 }
 
 function updateScale() {
@@ -201,7 +242,8 @@ function draw() {
     //c.fillRect(0, 0, canvas.width, canvas.height);
 
     //c.drawRect(0, 0, canvas.width, canvas.height);
-    c.fillStyle = "#d0d0d0";
+    c.strokeStyle = "#8F8F8F";
+    c.fillStyle = "#FFFFFF";
     c.beginPath();
     c.arc(
         cX(ball.pos), cY(ball.pos), cScale * ball.radius, 0.0, 2.0 * Math.PI
@@ -215,10 +257,11 @@ function draw() {
     c.strokeStyle = '#FFFFFF';
     c.lineWidth = 1;
     c.font = "16px serif";
-    c.strokeText(`Ball x: ${ball.pos.x}`, 10, 15);
-    c.strokeText(`Ball y: ${ball.pos.y}`, 10, 30);
-    let m = (ball.pos.y - (ball.pos.y - ball.vel.y)) / (ball.pos.x - (ball.pos.x - ball.vel.x));
-    c.strokeText(`Ball slope: ${m}`, 10, 45);
+    //c.strokeText(`Ball x: ${ball.pos.x}`, 10, 15);
+    //c.strokeText(`Ball y: ${ball.pos.y}`, 10, 30);
+    //let m = (ball.pos.y - (ball.pos.y - ball.vel.y)) / (ball.pos.x - (ball.pos.x - ball.vel.x));
+    //c.strokeText(`Ball slope: ${m}`, 10, 45);
+    c.strokeText('Hold W, A, D to add velocity', cX({x:10}), cY({y:simHeight-2}));
 }
 
 function updatepx() {
@@ -284,19 +327,32 @@ function simulate() {
 }
 
 function update() {
-    simulate();
+    if (!holdCycles) {
+        simulate();
+    } else {
+        holdCycles--;
+    }
     draw();
     requestAnimationFrame(update);
 }
 
 //objects.push(new RectangleObject(5, 5, 3, 3));
-//objects.push(new PointObject(1, 1, 1));
-//objects.push(new PointObject(5, 5, 1.5));
-//objects.push(new PointObject(8, 8, 2));
-objects.push(new PointObject(12, 12, 2.5));
+objects.push(new PointObject(2, 2, 1));
+objects.push(new PointObject(20, 3, 1.5));
+objects.push(new PointObject(8, 8, 1.7));
+objects.push(new PointObject(12, 12, 1.25));
+objects.push(new PointObject(15, 5, 0.4));
 
 
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('click', resizeCanvas); //Any click event...
+window.addEventListener("keypress", function(event) {
+    //console.log(event.keyCode);
+    switch (event.keyCode) {
+        /*W*/ case 119: ball.vel.y += 2; break;
+        /*A*/ case 97: ball.vel.x -= 2; break;
+        /*D*/ case 100: ball.vel.x += 2; break; 
+    }    
+  });
 resizeCanvas();
 update();
