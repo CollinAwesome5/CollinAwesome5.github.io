@@ -143,11 +143,22 @@ class PointObject {
             const solX2 = (-qb - quadC)/(2*qa);
             
             var collisionX = solX1;
-            if (((collisionX < x2) && (collisionX < xa)) || ((collisionX > x2) && (collisionX > xa)))
+            var collisionY = m*collisionX + b;
+            if ((((collisionX < x2) && (collisionX < ball.pos.x)) || ((collisionX > x2) && (collisionX > ball.pos.x))) ||
+                (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y)))) {
                 collisionX = solX2;
-            if (((collisionX < x2) && (collisionX < xa)) || ((collisionX > x2) && (collisionX > xa)))
-                return;
-            const collisionY = m*collisionX + b;
+                collisionY = m*collisionX + b;
+
+                if ((((collisionX < x2) && (collisionX < ball.pos.x)) || ((collisionX > x2) && (collisionX > ball.pos.x))) ||
+                    (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y))))  {
+                        console.log(`Error with collision, couldn't tell where it occurred.`);
+                        console.log(`Collision at: (${collisionX}, ${collisionY})`);
+                        console.log(`When ball at: (${ball.pos.x}, ${ball.pos.y})`);
+                        console.log(`When ball was: (${x2}, ${y2})`);                        
+                    return;
+                }
+            }
+
             this.lastContactTime = new Date();
 
             ball.pos.x = collisionX;
