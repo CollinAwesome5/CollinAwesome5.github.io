@@ -33,45 +33,44 @@ class PolyObject {
             if (point.x < minX) minX = point.x;
             if (point.y < minY) minY = point.y;
         });
-        const relativeRadialCenter = { x: (maxX - minX) / 2 - minX, y: (maxY - minY) / 2 - minY };
+        console.log(`Max X: ${maxX}, Min X: ${minX}, MaxY: ${maxY}, MinY: ${minY}`);
+        const relativeCenter = { x: (maxX + minX) / 2, y: (maxY + minY) / 2 };
+        console.log(relativeCenter);
         this.polyIndicies = [];
         for (const point of polyIndicies)
-            this.polyIndicies.push({x: point.x - relativeRadialCenter.x, y: point.y - relativeRadialCenter.y});
+            this.polyIndicies.push({x: point.x - relativeCenter.x, y: point.y - relativeCenter.y});
         console.log(this.polyIndicies);
         var maxDist = 0;
         this.polyIndicies.forEach((point) => { 
             const dist = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
             if (dist > maxDist) maxDist = dist;
         });
-        this.centerPoint = {x: relativeRadialCenter.x + x, y: relativeRadialCenter.y + y};
         this.radius = maxDist;
         this.surfaceType = "bounce";
         this.friction = 0.75;
         this.lastContactTime = new Date(0, 0, 0);
         this.color = "#0000FF";
-        console.log(`Poly center: (${this.centerPoint.x}, ${this.centerPoint.y}), radius: ${this.radius}`);
+        console.log(`Poly center: (${this.x}, ${this.y}), radius: ${this.radius}`);
     }
 
     draw(c, ball) {
         c.lineWidth = 2;
-        c.strokeStyle = "#3FFF5F";
+        c.strokeStyle = "#6FDF8F";
 
-        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.centerPoint.x, 2) + Math.pow(ball.pos.y - this.centerPoint.y, 2));
-        if (ballDist < (this.radius + ball.radius)) {
-            //check for impact...
-            c.strokeStyle = "#FF0000";
-        }
+        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
+        if (ballDist < (this.radius + ball.radius))
+            c.strokeStyle = "#3FFF5F";
 
         c.beginPath();
         const lastPoint = this.polyIndicies[this.polyIndicies.length - 1];
-        c.moveTo(cX({x:lastPoint.x + this.centerPoint.x}), cY({y:lastPoint.y + this.centerPoint.y}));
+        c.moveTo(cX({x:lastPoint.x + this.x}), cY({y:lastPoint.y + this.y}));
         for (const point of this.polyIndicies) 
-            c.lineTo(cX({x:point.x + this.centerPoint.x}), cY({y:point.y + this.centerPoint.y}));
+            c.lineTo(cX({x:point.x + this.x}), cY({y:point.y + this.y}));
         c.stroke();
     }
 
     influenceBall(ball) {
-        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.centerPoint.x, 2) + Math.pow(ball.pos.y - this.centerPoint.y, 2));
+        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
         if (ballDist < (this.radius + ball.radius)) {
             //check for impact...
 
