@@ -21,6 +21,64 @@ var collisions = [];
 
 var simWidth, simHeight, cScale;
 
+class PolyObject {
+    constructor(x, y, polyIndicies) {
+        this.x = x;
+        this.y = y;
+        var maxX = polyIndicies[0].x; var maxY = polyIndicies[0].y;
+        var minX = polyIndicies[0].x; var minY = polyIndicies[0].y;
+        polyIndicies.forEach((point) => {
+            if (point.x > maxX) maxX = point.x;
+            if (point.y > maxY) maxY = point.y;
+            if (point.x < minX) minX = point.x;
+            if (point.y < minY) minY = point.y;
+        });
+        const relativeRadialCenter = { x: (maxX - minX) / 2 - minX, y: (maxY - minY) / 2 - minY };
+        this.polyIndicies = [];
+        for (const point of polyIndicies)
+            this.polyIndicies.push({x: point.x - relativeRadialCenter.x, y: point.y - relativeRadialCenter.y});
+        console.log(this.polyIndicies);
+        var maxDist = 0;
+        this.polyIndicies.forEach((point) => { 
+            const dist = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
+            if (dist > maxDist) maxDist = dist;
+        });
+        this.centerPoint = {x: relativeRadialCenter.x + x, y: relativeRadialCenter.y + y};
+        this.radius = maxDist;
+        this.surfaceType = "bounce";
+        this.friction = 0.75;
+        this.lastContactTime = new Date(0, 0, 0);
+        this.color = "#0000FF";
+        console.log(`Poly center: (${this.centerPoint.x}, ${this.centerPoint.y}), radius: ${this.radius}`);
+    }
+
+    draw(c, ball) {
+        c.lineWidth = 2;
+        c.strokeStyle = "#3FFF5F";
+
+        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.centerPoint.x, 2) + Math.pow(ball.pos.y - this.centerPoint.y, 2));
+        if (ballDist < (this.radius + ball.radius)) {
+            //check for impact...
+            c.strokeStyle = "#FF0000";
+        }
+
+        c.beginPath();
+        const lastPoint = this.polyIndicies[this.polyIndicies.length - 1];
+        c.moveTo(cX({x:lastPoint.x + this.centerPoint.x}), cY({y:lastPoint.y + this.centerPoint.y}));
+        for (const point of this.polyIndicies) 
+            c.lineTo(cX({x:point.x + this.centerPoint.x}), cY({y:point.y + this.centerPoint.y}));
+        c.stroke();
+    }
+
+    influenceBall(ball) {
+        const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.centerPoint.x, 2) + Math.pow(ball.pos.y - this.centerPoint.y, 2));
+        if (ballDist < (this.radius + ball.radius)) {
+            //check for impact...
+
+        }
+    }
+}
+
 class RectangleObject {
     constructor(x, y, height, width) {
         this.x = x;
@@ -353,6 +411,14 @@ objects.push(new PointObject(20, 3, 1.5));
 objects.push(new PointObject(8, 8, 1.7));
 objects.push(new PointObject(12, 12, 1.25));
 objects.push(new PointObject(15, 5, 0.4));
+objects.push(new PolyObject(5, 15, [
+    {x: 1, y: 1},
+    {x: 1, y: 2},
+    {x: 1.5, y: 2.5},
+    {x: 7, y: 2.25},
+    {x:2, y:2},
+    {x: 2, y:1}
+]));
 
 
 window.addEventListener('resize', resizeCanvas);
