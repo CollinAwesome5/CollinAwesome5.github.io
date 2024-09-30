@@ -13,7 +13,8 @@ var timeStep = 1.0 / 60.0;
 var ball = { 
     radius: 0.5,
     pos: { x: 0.5, y: 20.0 },
-    vel: { x: 40.0, y: 0.0 }
+    vel: { x: 40.0, y: 0.0 },
+    lastContact: new Date(0, 0, 0),
 };
 
 var objects = [];
@@ -67,13 +68,201 @@ class PolyObject {
         for (const point of this.polyIndicies) 
             c.lineTo(cX({x:point.x + this.x}), cY({y:point.y + this.y}));
         c.stroke();
+
+        c.strokeStyle = "#5F0000";
+        c.beginPath();
+        c.arc(cX(this), cY(this), cScale * this.radius, 0.0, 2.0 * Math.PI);
+        c.closePath();
+        c.stroke();
+
+        const Xb0 = ball.pos.x - ball.vel.x*timeStep;
+        const Yb0 = ball.pos.y - ball.vel.y*timeStep;
+        const Xb1 = ball.pos.x;
+        const Yb1 = ball.pos.y;
+        const Mb = (Yb1 - Yb0) / (Xb1 - Xb0);
+        const Bb = Yb0 - Mb*Xb0;
+        c.strokeStyle = "#505F50";
+        c.beginPath();
+        c.moveTo(cX({x:0}), cY({y:Bb}));
+        c.lineTo(cX({x:30}), cY({y: Mb*30 + Bb}));
+        c.closePath();
+        c.stroke();
+    }
+
+    getIntersectionPoint(ball, segmentNo) {
+        const pointI0 = this.polyIndicies[(segmentNo === 0 ? this.polyIndicies.length : segmentNo) - 1];
+        const pointI1 = this.polyIndicies[segmentNo];
+        const Xi0 = pointI0.x + this.x;
+        const Yi0 = pointI0.y + this.y;
+        const Xi1 = pointI1.x + this.x;
+        const Yi1 = pointI1.y + this.y;
+        if (Xi1-Xi0 == 0) return undefined;
+        const Mi = (Yi1 - Yi0) / (Xi1 - Xi0);
+        const Bi = Yi0 - Mi*Xi0;
+
+        const Xb0 = ball.pos.x - ball.vel.x*timeStep;
+        const Yb0 = ball.pos.y - ball.vel.y*timeStep;
+        const Xb1 = ball.pos.x;
+        const Yb1 = ball.pos.y;
+        if (Xb1-Xb0 == 0) return undefined;
+        const Mb = (Yb1 - Yb0) / (Xb1 - Xb0);
+        const Bb = Yb0 - Mb*Xb0;
+
+        //console.log(`Ball m:${Mb}, b:${Bb}, (${Xb0}, ${Yb0}) -> (${Xb1}, ${Yb1})`);
+        //console.log(`Intercept m:${Mi}, b:${Bi}, (${Xi0}, ${Yi0}) -> (${Xi1}, ${Yi1})`);        
+
+        const MbSqd = Math.pow(Mb, 2);
+        const MiSqd = Math.pow(Mi, 2);
+        const BbSqd = Math.pow(Bb, 2);
+        const BiSqd = Math.pow(Bi, 2);
+        const W = 1 + MiSqd;
+        const J = BiSqd - Math.pow(ball.radius, 2);
+        const A = W - 1 - 2*Mi*Mb - MiSqd*MbSqd + W*MbSqd;
+        const B = -2*Bb*W + 2*Bb + 2*Mi*Bi*Mb - 2*W*Bi*MbSqd + 2*MiSqd*MbSqd*Bi + 2*Mi*Mb*Bb;
+        const C = BbSqd*W - BbSqd - MbSqd*(MiSqd*BiSqd-W*J) - 2*Mi*Bi*Mb*Bb;
+
+        //Quadratic for ball position
+        const determ = Math.pow(B, 2) - (4 * A * C);
+        if (determ < 0) {
+            console.log('No hit');
+            return undefined; //No solution.
+        }
+        const quad = Math.sqrt(determ);
+        const y0 = (-B + quad) / (2 * A);
+        const y1 = (-B - quad) / (2 * A);
+        const x0 = (y0 - Bb) / Mb;
+        const x1 = (y1 - Bb) / Mb;
+        const ballPosAtIntercept = (Math.abs(Xb0 - x0) < Math.abs(Xb0 - x1)) || (Math.abs(Yb0 - y0) < Math.abs(Yb0 - y1)) ? {x: x0, y: y0} : {x: x1, y: y1};
+        if (((ballPosAtIntercept.x < Xb0) && (ballPosAtIntercept.x < Xb1)) || ((ballPosAtIntercept.x > Xb0) && (ballPosAtIntercept.x > Xb1)) || 
+            ((ballPosAtIntercept.y < Yb0) && (ballPosAtIntercept.y < Yb1)) || ((ballPosAtIntercept.y > Yb0) && (ballPosAtIntercept.y > Yb1)))
+            return undefined;
+
+        //Not check where it intercepted the segment
+        const Ia = 1+MiSqd;
+        const Ib = 2*(Mi*Bi-Mi*ballPosAtIntercept.y-ballPosAtIntercept.x);
+        const Ic = Math.pow(ballPosAtIntercept.x, 2) + Math.pow(Bi - ballPosAtIntercept.y, 2) - Math.pow(ball.radius, 2);
+        const determ2 = Math.pow(Ib, 2) - 4*Ia*Ic;
+        if (Math.abs(4*Ia*Ic - Math.pow(Ib, 2)) > 0.00001) console.log(`Error in formula, b*b != 4ac...${Math.pow(Ib, 2)} != ${4*Ia*Ic}, dif: ${determ2}`);
+        const interceptPointX = -Ib / (2*Ia);
+        const interceptPointY = Mi*interceptPointX + Bi;
+        if (((interceptPointX < Xi0) && (interceptPointX < Xi1)) || ((interceptPointX > Xi0) && (interceptPointX > Xi1)) || 
+            ((interceptPointY < Yi0) && (interceptPointY < Yi1)) || ((interceptPointY > Yi0) && (interceptPointY > Yi1)))
+            return undefined; //Intercept was out of bounds
+
+        console.log(ballPosAtIntercept);    
+        var impactNormY = ballPosAtIntercept.y - interceptPointY;
+        var impactNormX = ballPosAtIntercept.x - interceptPointX;
+        const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
+        impactNormX = impactNormX / impactVecLen;
+        impactNormY = impactNormY / impactVecLen;
+
+        const distToIntercept = Math.sqrt(Math.pow(Xb0 - ballPosAtIntercept.x, 2) + Math.pow(Yb0, 2));
+
+        return {ballPosAtIntercept, distToIntercept, interceptNormal: {x: impactNormX, y: impactNormY}, interceptPoint: {x:interceptPointX, y: interceptPointY}};
+    }
+
+    getEndPointCollision(ball, pointNo) {
+        const point = this.polyIndicies[pointNo];
+        const xa = point.x + this.x;
+        const ya = point.y + this.y;
+        const x2 = ball.pos.x - ball.vel.x * timeStep;
+        const y2 = ball.pos.y - ball.vel.y * timeStep;
+        const m=(ball.pos.y - y2) / (ball.pos.x - x2);
+        const b=y2-m*x2;
+        const di = ball.radius;
+        const yab = ya - b;
+        
+        //quadratic
+        const qa = (m*m) + 1;
+        const qb = -2*(xa + yab*m);
+        const qc = (xa*xa) + (yab*yab) - (di*di);
+        const determ = (qb*qb) - 4*qa*qc;
+        if (determ < 0) return undefined;
+        const quadC = Math.sqrt(determ);
+        const solX1 = (-qb + quadC)/(2*qa);
+        const solX2 = (-qb - quadC)/(2*qa);
+
+        var collisionX = solX1;
+        var collisionY = m*collisionX + b;
+        if ((((collisionX < x2) && (collisionX < ball.pos.x)) || ((collisionX > x2) && (collisionX > ball.pos.x))) ||
+            (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y)))) {
+            collisionX = solX2;
+            collisionY = m*collisionX + b;
+
+            if ((((collisionX < x2) && (collisionX < ball.pos.x)) || ((collisionX > x2) && (collisionX > ball.pos.x))) ||
+                (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y))))  {
+                    //console.log(`Error with collision, couldn't tell where it occurred.`);
+                    //console.log(`Collision at: (${collisionX}, ${collisionY})`);
+                    //console.log(`When ball at: (${ball.pos.x}, ${ball.pos.y})`);
+                    //console.log(`When ball was: (${x2}, ${y2})`);                        
+                return undefined;
+            }
+        }
+
+        
+        const impactX = collisionX + (this.x - collisionX);
+        const impactY = collisionY + (this.y - collisionY);
+        var impactNormX = impactX - collisionX;
+        var impactNormY = impactY - collisionY;
+        const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
+        impactNormX = impactNormX / impactVecLen;
+        impactNormY = impactNormY / impactVecLen;
+        //const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
+        //ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength;
+        //ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength;
+        //ball.pos.x = collisionX;
+        //ball.pos.y = collisionY;
+        const distToIntercept = Math.sqrt(Math.pow(x2 - collisionX, 2) + Math.pow(y2 - collisionY, 2));
+
+        return {ballPosAtIntercept: {x: collisionX, y: collisionY}, distToIntercept, interceptNormal: {x: impactNormX, y: impactNormY}, interceptPoint: {x:impactX, y: impactY}};
     }
 
     influenceBall(ball) {
         const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
         if (ballDist < (this.radius + ball.radius)) {
             //check for impact...
+            var closestIntercept;
+            for (let i=0;i<this.polyIndicies.length;i++) {
+                var intercept = this.getIntersectionPoint(ball, i); 
+                const endPointIntercept = this.getEndPointCollision(ball, i);  
+                if ((endPointIntercept) && ((!intercept) || (intercept?.distToIntercept > endPointIntercept?.distToIntercept))) {
+                  console.log('got end endpoint');//    intercept = endPointIntercept;       
+                  console.log(endPointIntercept); 
+                  intercept = endPointIntercept;
+                }
+                if (intercept) {
+                    if ((!closestIntercept) || (intercept.distToIntercept < closestIntercept.distToIntercept)) {
+                        closestIntercept = intercept;
+                    }                    
+                }
+            }
 
+            if (closestIntercept) {
+                const impactNormX = closestIntercept.interceptNormal.x;
+                const impactNormY = closestIntercept.interceptNormal.y;
+                const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
+                ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.friction;
+                ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.friction;
+                ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*0.00001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*0.00001};
+
+                collisions.push(new Collision(closestIntercept.ballPosAtIntercept.x, closestIntercept.ballPosAtIntercept.y, "#FFDFFF"));
+                collisions.push(new Collision(closestIntercept.interceptPoint.x, closestIntercept.interceptPoint.y, "#0FDF0F"));
+                ball.lastContact = new Date();
+                while (collisions.length > 200) {
+                    collisions.shift();
+                }  
+            }
+
+/*
+                if (intercept) {
+                    collisions.push(new Collision(intercept.x, intercept.y, "#FFDFFF"));
+                    ball.lastContact = new Date();
+                    while (collisions.length > 10) {
+                        collisions.shift();
+                    }  
+                
+            }
+            */
         }
     }
 }
@@ -312,6 +501,7 @@ function draw() {
     //c.drawRect(0, 0, canvas.width, canvas.height);
     c.strokeStyle = "#8F8F8F";
     c.fillStyle = "#FFFFFF";
+    if (new Date().getTime() - ball.lastContact.getTime() < 200) c.fillStyle = "#800000";
     c.beginPath();
     c.arc(
         cX(ball.pos), cY(ball.pos), cScale * ball.radius, 0.0, 2.0 * Math.PI
@@ -405,14 +595,14 @@ function update() {
 }
 
 //objects.push(new RectangleObject(5, 5, 3, 3));
-objects.push(new PointObject(2, 2, 1));
+//objects.push(new PointObject(2, 2, 1));
 objects.push(new PointObject(20, 3, 1.5));
-objects.push(new PointObject(8, 8, 1.7));
+//objects.push(new PointObject(8, 8, 1.7));
 objects.push(new PointObject(12, 12, 1.25));
 objects.push(new PointObject(15, 5, 0.4));
-objects.push(new PolyObject(5, 15, [
-    {x: 1, y: 1},
-    {x: 1, y: 2},
+objects.push(new PolyObject(5, 10, [
+    {x: 1.2, y: 1.3},
+    {x: 0, y: 20},
     {x: 1.5, y: 2.5},
     {x: 7, y: 2.25},
     {x:2, y:2},
