@@ -48,7 +48,7 @@ class PolyObject {
         });
         this.radius = maxDist;
         this.surfaceType = "bounce";
-        this.friction = 0.75;
+        this.friction = 0.8;
         this.lastContactTime = new Date(0, 0, 0);
         this.color = "#0000FF";
         console.log(`Poly center: (${this.x}, ${this.y}), radius: ${this.radius}`);
@@ -137,7 +137,7 @@ class PolyObject {
             ((ballPosAtIntercept.y < Yb0) && (ballPosAtIntercept.y < Yb1)) || ((ballPosAtIntercept.y > Yb0) && (ballPosAtIntercept.y > Yb1)))
             return undefined;
 
-        //Not check where it intercepted the segment
+        //Now check where it intercepted the segment
         const Ia = 1+MiSqd;
         const Ib = 2*(Mi*Bi-Mi*ballPosAtIntercept.y-ballPosAtIntercept.x);
         const Ic = Math.pow(ballPosAtIntercept.x, 2) + Math.pow(Bi - ballPosAtIntercept.y, 2) - Math.pow(ball.radius, 2);
@@ -190,28 +190,18 @@ class PolyObject {
             collisionY = m*collisionX + b;
 
             if ((((collisionX < x2) && (collisionX < ball.pos.x)) || ((collisionX > x2) && (collisionX > ball.pos.x))) ||
-                (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y))))  {
-                    //console.log(`Error with collision, couldn't tell where it occurred.`);
-                    //console.log(`Collision at: (${collisionX}, ${collisionY})`);
-                    //console.log(`When ball at: (${ball.pos.x}, ${ball.pos.y})`);
-                    //console.log(`When ball was: (${x2}, ${y2})`);                        
+                (((collisionY < y2) && (collisionY < ball.pos.y)) || ((collisionY > y2) && (collisionY > ball.pos.y))))  {                   
                 return undefined;
             }
         }
 
-        
-        const impactX = collisionX + (this.x - collisionX);
-        const impactY = collisionY + (this.y - collisionY);
+        const impactX = xa;
+        const impactY = ya;
         var impactNormX = impactX - collisionX;
         var impactNormY = impactY - collisionY;
         const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
         impactNormX = impactNormX / impactVecLen;
         impactNormY = impactNormY / impactVecLen;
-        //const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
-        //ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength;
-        //ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength;
-        //ball.pos.x = collisionX;
-        //ball.pos.y = collisionY;
         const distToIntercept = Math.sqrt(Math.pow(x2 - collisionX, 2) + Math.pow(y2 - collisionY, 2));
 
         return {ballPosAtIntercept: {x: collisionX, y: collisionY}, distToIntercept, interceptNormal: {x: impactNormX, y: impactNormY}, interceptPoint: {x:impactX, y: impactY}};
@@ -243,8 +233,13 @@ class PolyObject {
                 const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
                 ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.friction;
                 ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.friction;
-                ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*0.00001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*0.00001};
+                ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*timeStep*0.001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*timeStep*0.001};
 
+                if (Math.abs(ball.vel.y) < 0.1) {
+                    //Roll the ball
+                    console.log(`Rolling the ball...${impactNormX}`);
+                    ball.vel.x += impactNormX*10;
+                }
                 collisions.push(new Collision(closestIntercept.ballPosAtIntercept.x, closestIntercept.ballPosAtIntercept.y, "#FFDFFF"));
                 collisions.push(new Collision(closestIntercept.interceptPoint.x, closestIntercept.interceptPoint.y, "#0FDF0F"));
                 ball.lastContact = new Date();
@@ -434,7 +429,7 @@ class PointObject {
             console.log(`b2 - 4ac: (${qb*qb}) - 4(${qa}*${qc}) = ${qb*qb - 4*qa*qc}`);
 */
 
-            if (isNaN(collisionX)) exit(1);
+            if (isNaN(collisionX)) return; //exit(1);
 
             //collisions.push(new Collision(ball.pos.x, ball.pos.y, "#FF00FF"));
             
@@ -600,11 +595,11 @@ objects.push(new PointObject(20, 3, 1.5));
 //objects.push(new PointObject(8, 8, 1.7));
 objects.push(new PointObject(12, 12, 1.25));
 objects.push(new PointObject(15, 5, 0.4));
-objects.push(new PolyObject(5, 10, [
+objects.push(new PolyObject(10, 5, [
     {x: 1.2, y: 1.3},
-    {x: 0, y: 20},
+    {x: 0, y: 10},
     {x: 1.5, y: 2.5},
-    {x: 7, y: 2.25},
+    {x: 14, y: 1.5},
     {x:2, y:2},
     {x: 2, y:1}
 ]));
@@ -615,7 +610,7 @@ window.addEventListener('click', resizeCanvas); //Any click event...
 window.addEventListener("keypress", function(event) {
     //console.log(event.keyCode);
     switch (event.keyCode) {
-        /*W*/ case 119: ball.vel.y += 2; break;
+        /*W*/ case 119: ball.vel.y += 6; break;
         /*A*/ case 97: ball.vel.x -= 2; break;
         /*D*/ case 100: ball.vel.x += 2; break; 
     }    
