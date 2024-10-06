@@ -207,6 +207,47 @@ class PolyObject {
         return {ballPosAtIntercept: {x: collisionX, y: collisionY}, distToIntercept, interceptNormal: {x: impactNormX, y: impactNormY}, interceptPoint: {x:impactX, y: impactY}};
     }
 
+    isBallPosInvalid(x, y, radius) {
+        for (let i=0;i<this.polyIndicies.length;i++) {
+            const point1 = this.polyIndicies[i];
+            const x1 = point1.x + this.x;
+            const y1 = point1.y + this.y;
+            
+            //Check for end point collision
+            if (Math.sqrt(Math.pow(x - x1, 2) + Math.pow(y - y1)) <= radius) return false;
+
+            //Check for line segment collision
+            const i0 = (i == 0 ? this.polyIndicies.length - 1 : i-1);
+            const point0 = this.polyIndicies[i0];
+            const x0 = point0.x + this.x;
+            const y0 = point0.y + this.y;
+
+            const m = (y1 - y0) / (x1 - x0);
+            const b = y1 - m*x1;
+
+            const qa = 1 + Math.pow(m, 2);
+            const qb = 2*(-m*y + m*b - x);
+            const qc = Math.pow(x, 2) + Math.pow(b, 2) -2*b*y + Math.pow(y, 2) - Math.pow(radius, 2);
+
+            const detSq = Math.pow(qb, 2) - 4*qa*qc;
+            if (detSq > 0) { //Overlap somewhere...
+                const det = Math.sqrt(detSq);
+
+                const collisionX0 = (-qb + det)/(2*qa);
+                const collisionX1 = (-qb - det)/(2*qa);
+
+                if ((((collisionX0 < x1) && (collisionX0 < x0)) || ((collisionX0 > x1) && (collisionX0 > x0))) && 
+                    (((collisionX1 < x1) && (collisionX1 < x0)) || ((collisionX1 > x1) && (collisionX1 > x0)))) continue;
+                else return false; //There is a solution, so there's overlap
+            }
+        }
+        return true;
+    }
+
+    posWithAngleRadius(angleRad, radius, offset) {
+        return { x: Math.cos(angleRad)*radius + offset?.x ?? 0, y: Math.sin(angleRad)*radius + offset?.y ?? 0 };
+    }
+
     influenceBall(ball) {
         const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
         if (ballDist < (this.radius + ball.radius)) {
@@ -231,14 +272,31 @@ class PolyObject {
                 const impactNormX = closestIntercept.interceptNormal.x;
                 const impactNormY = closestIntercept.interceptNormal.y;
                 const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
-                ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.friction;
+                 
                 ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.friction;
-                ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*timeStep*0.001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*timeStep*0.001};
-
-                if (Math.abs(ball.vel.y) < 0.1) {
+                console.log(`Velocity y: ${ball.vel.y}`);
+                if (ball.vel.y > 0 && ball.vel.y < 0.1) {
                     //Roll the ball
                     console.log(`Rolling the ball...${impactNormX}`);
-                    ball.vel.x += impactNormX*10;
+                    ball.vel.x = (ball.vel.x - 2 * impactNormX * dot);
+                    //ball.vel.x += impactNormX*10;
+                } else {
+                    ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.friction;
+                }
+                ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*timeStep*0.001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*timeStep*0.001};
+
+                var searchAttempts = 0;
+                while (!this.isBallPosInvalid(ball.pos.x, ball.pos.y, ball.radius)) {
+                    console.log("Ball position invalid, looking for closest valid position...");
+                    const searchRadiusFidelity = 0.1;
+                    const searchAngleFidelity = 2 * Math.PI / 4;
+                    
+                    const angle = searchAngleFidelity * searchAttempts;
+                    const searchRadius = searchRadiusFidelity * searchAttempts;
+                    const searchPos = this.posWithAngleRadius(angle, searchRadius, ball.pos);
+                    ball.pos.x = searchPos.x;
+                    ball.pos.y = searchPos.y;
+                    searchAttempts++;
                 }
                 collisions.push(new Collision(closestIntercept.ballPosAtIntercept.x, closestIntercept.ballPosAtIntercept.y, "#FFDFFF"));
                 collisions.push(new Collision(closestIntercept.interceptPoint.x, closestIntercept.interceptPoint.y, "#0FDF0F"));
