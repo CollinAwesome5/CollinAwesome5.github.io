@@ -12,7 +12,7 @@ var timeStep = 1.0 / 60.0;
 
 var ball = { 
     radius: 0.5,
-    pos: { x: 0.5, y: 20.0 },
+    pos: { x: 10, y: 15.0 },
     vel: { x: 40.0, y: 0.0 },
     lastContact: new Date(0, 0, 0),
 };
@@ -21,6 +21,15 @@ var objects = [];
 var collisions = [];
 
 var simWidth, simHeight, cScale;
+
+function isPosInPath(x, y, x0, y0, x1, y1) {
+    if ((((x > x0) && (x > x1)) || ((x < x0) && (x < x1))) || (((y > y0) && (y > y1)) || ((y < y0) && (y < y1)))) return false;
+    else return true;
+}
+
+function posWithAngleRadius(angleRad, radius, offset) {
+    return { x: Math.cos(angleRad)*radius + offset?.x ?? 0, y: Math.sin(angleRad)*radius + offset?.y ?? 0 };
+}
 
 class PolyObject {
     constructor(x, y, polyIndicies) {
@@ -69,13 +78,14 @@ class PolyObject {
             c.lineTo(cX({x:point.x + this.x}), cY({y:point.y + this.y}));
         c.stroke();
 
-        c.strokeStyle = "#5F0000";
+        /*c.strokeStyle = "#5F0000";
         c.beginPath();
         c.arc(cX(this), cY(this), cScale * this.radius, 0.0, 2.0 * Math.PI);
         c.closePath();
-        c.stroke();
+        c.stroke();*/
 
-        const Xb0 = ball.pos.x - ball.vel.x*timeStep;
+      
+      /*  const Xb0 = ball.pos.x - ball.vel.x*timeStep;
         const Yb0 = ball.pos.y - ball.vel.y*timeStep;
         const Xb1 = ball.pos.x;
         const Yb1 = ball.pos.y;
@@ -86,7 +96,7 @@ class PolyObject {
         c.moveTo(cX({x:0}), cY({y:Bb}));
         c.lineTo(cX({x:30}), cY({y: Mb*30 + Bb}));
         c.closePath();
-        c.stroke();
+        c.stroke();*/
     }
 
     getIntersectionPoint(ball, segmentNo) {
@@ -244,10 +254,6 @@ class PolyObject {
         return true;
     }
 
-    posWithAngleRadius(angleRad, radius, offset) {
-        return { x: Math.cos(angleRad)*radius + offset?.x ?? 0, y: Math.sin(angleRad)*radius + offset?.y ?? 0 };
-    }
-
     influenceBall(ball) {
         const ballDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
         if (ballDist < (this.radius + ball.radius)) {
@@ -293,7 +299,7 @@ class PolyObject {
                     
                     const angle = searchAngleFidelity * searchAttempts;
                     const searchRadius = searchRadiusFidelity * searchAttempts;
-                    const searchPos = this.posWithAngleRadius(angle, searchRadius, ball.pos);
+                    const searchPos = posWithAngleRadius(angle, searchRadius, ball.pos);
                     ball.pos.x = searchPos.x;
                     ball.pos.y = searchPos.y;
                     searchAttempts++;
@@ -395,29 +401,6 @@ class PointObject {
         c.arc(cX(this), cY(this), cScale * this.radius*radiusScaler, 0.0, 2.0 * Math.PI);
         c.closePath();
         c.fill();
-
-        if (ball) {
-            /*const dist = Math.sqrt(Math.pow(this.x - ball.pos.x, 2) + Math.pow(this.y - ball.pos.y, 2));
-            c.strokeStyle = '#FF0000';
-            c.font = "16px serif";
-            c.lineWidth = 1;
-            c.strokeText(`Ball dist: ${dist}`, cX(this), cY(this));
-            c.closePath();*/
-
-            /*
-            const xa = this.x;
-            const ya = this.y;
-            const x2 = ball.pos.x - ball.vel.x * timeStep;
-            const y2 = ball.pos.y - ball.vel.y * timeStep;
-            const m=(ball.pos.y - y2) / (ball.pos.x - x2);
-            const b=y2-m*x2;
-            c.lineWidth = 2;
-            c.strokeStyle = "#3FFF5F";
-            c.beginPath();
-            c.moveTo(cX({x:0}), cY({y:m*0+b}));
-            c.lineTo(cX({x:simWidth}), cY({y:m*simWidth+b}));
-            c.stroke();*/
-        }
     }
 
     influenceBall(ball) {
@@ -502,6 +485,158 @@ class PointObject {
     }
 }
 
+class ArcObject {
+    constructor(x, y, radius, startRadians, endRadians, friction) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.startRadians = startRadians;
+        this.endRadians = endRadians;
+        this.surfaceType = "bounce";
+        this.friction = friction ?? 0.75;
+        this.lastContactTime = new Date(0, 0, 0);
+        this.color = "#0000FF";
+        this.bounceStrength = 1.0;
+    }
+
+    draw(c, ball) {
+        c.strokeStyle = "#8F8F8F";
+        c.beginPath();
+        c.arc(cX(this), cY(this), cScale * this.radius, Math.PI*2 - this.endRadians, Math.PI*2 - this.startRadians, false);
+        //c.closePath();
+        c.stroke();
+    }
+
+    relativePosInRadians(x, y) {
+        const deltaX = x - this.x;
+        const deltaY = y - this.y;
+        var posRads = Math.atan(deltaY / deltaX);
+        if (deltaX < 0) return Math.PI+posRads;
+        if ((deltaY < 0) && (deltaX > 0)) return Math.PI*2+posRads;
+        return posRads;
+    }
+
+    isBallPosInvalid(x, y, radius) {
+        const dist = Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
+        console.log(`Distance: ${Math.abs(this.radius - dist)}, Radius: ${radius}`);
+        if (radius < Math.abs(this.radius - dist)) return true;
+        const posAngle = this.relativePosInRadians(x, y);
+        if ((posAngle > this.startRadians) && (posAngle < this.endRadians)) return false;
+        return true;
+    }
+
+    influenceBall(ball) {
+        const dist = Math.sqrt(Math.pow(this.x - ball.pos.x, 2) + Math.pow(this.y - ball.pos.y, 2));
+        if ((ball.radius + this.radius) >= dist) {
+            
+            const xa = this.x;
+            const ya = this.y;
+            const x2 = ball.pos.x - ball.vel.x * timeStep;
+            const y2 = ball.pos.y - ball.vel.y * timeStep;
+            const m=(ball.pos.y - y2) / (ball.pos.x - x2);
+            const b=y2-m*x2;
+            const diOut = ball.radius + this.radius;
+            const diIn = this.radius - ball.radius;
+            const yab = ya - b;
+            
+            //quadratic
+            const qa = (m*m) + 1;
+            const qb = -2*(xa + yab*m);
+            const qcOutside = (xa*xa) + (yab*yab) - (diIn*diIn);
+            const qcInside = (xa*xa) + (yab*yab) - (diOut*diOut);
+            const detOutside = (qb*qb) - 4*qa*qcOutside;
+            const detInside = (qb*qb) - 4*qa*qcInside;
+
+            if ((detOutside < 0) && (detInside < 0))
+                return;
+
+            const quadCOutside = Math.sqrt(detOutside);
+            const quadCInside = Math.sqrt(detInside);
+            const solX1Outside = (-qb + quadCOutside)/(2*qa);
+            const solX2Outside = (-qb - quadCOutside)/(2*qa);
+            const solX1Inside = (-qb + quadCInside)/(2*qa);
+            const solX2Inside = (-qb - quadCInside)/(2*qa);
+
+            //console.log(`Position ${this.relativePosInRadians(ball.pos.x, ball.pos.y)}`);
+            var collisionAngleRad1Outside = this.relativePosInRadians(solX1Outside, m*solX1Outside + b);//Math.atan((m*solX1Outside + b - this.y) / (solX1Outside - this.x));
+            var collisionAngleRad2Outside = this.relativePosInRadians(solX2Outside, m*solX2Outside + b);//Math.atan((m*solX2Outside + b - this.y) / (solX2Outside - this.x));
+            var collisionAngleRad1Inside = this.relativePosInRadians(solX1Inside, m*solX1Inside + b);//Math.atan((m*solX1Inside + b - this.y) / (solX1Inside - this.x));
+            var collisionAngleRad2Inside = this.relativePosInRadians(solX2Inside, m*solX2Inside + b);//Math.atan((m*solX2Inside + b - this.y) / (solX2Inside - this.x));
+
+            var collisionX, collisionAngle;
+            //console.log(`Rad1Outside: ${collisionAngleRad1Outside}, Rad1Inside: ${collisionAngleRad1Inside}`);
+            //console.log(`Rad2Outside: ${collisionAngleRad2Outside}, Rad2Inside: ${collisionAngleRad2Inside}`);
+
+            var closestIntercept = Infinity;
+            if ((collisionAngleRad1Outside > this.startRadians) && (collisionAngleRad1Outside < this.endRadians) && 
+                (isPosInPath(solX1Outside, m*solX1Outside + b, ball.pos.x, ball.pos.y, x2, y2)) &&
+                ((Math.abs(solX1Outside - x2) < closestIntercept))) {
+                collisionX = solX1Outside;
+                collisionAngle = collisionAngleRad1Outside;
+                closestIntercept = Math.abs(collisionX - x2);
+            }
+            if ((collisionAngleRad2Outside > this.startRadians) && (collisionAngleRad2Outside < this.endRadians) && 
+                (isPosInPath(solX2Outside, m*solX2Outside + b, ball.pos.x, ball.pos.y, x2, y2)) &&
+                ((Math.abs(solX2Outside - x2) < closestIntercept))) {
+                collisionX = solX2Outside;
+                collisionAngle = collisionAngleRad2Outside;
+                closestIntercept = Math.abs(collisionX - x2);
+            }
+            if ((collisionAngleRad1Inside > this.startRadians) && (collisionAngleRad1Inside < this.endRadians) && 
+                (isPosInPath(solX1Inside, m*solX1Inside + b, ball.pos.x, ball.pos.y, x2, y2)) &&
+                ((Math.abs(solX1Inside - x2) < closestIntercept))) {
+                collisionX = solX1Inside;
+                collisionAngle = collisionAngleRad1Inside;
+                closestIntercept = Math.abs(collisionX - x2);
+            }
+            if ((collisionAngleRad2Inside > this.startRadians) && (collisionAngleRad2Inside < this.endRadians) && 
+                (isPosInPath(solX2Inside, m*solX2Inside + b, ball.pos.x, ball.pos.y, x2, y2)) &&
+                ((Math.abs(solX2Inside - x2) < closestIntercept))) {
+                collisionX = solX2Inside;
+                collisionAngle = collisionAngleRad2Inside;
+                closestIntercept = Math.abs(collisionX - x2);
+            }
+            if (isNaN(collisionX)) return;
+
+            const collisionY = m*collisionX + b;
+            const impactX = Math.cos(collisionAngle) * this.radius + this.x; //* radiusRatio;
+            const impactY = Math.sin(collisionAngle) * this.radius + this.y;// * radiusRatio;
+            
+            collisions.push(new Collision(collisionX, collisionY, "#0FDF0F"));
+            collisions.push(new Collision(impactX, impactY, "#FFDFFF"));
+            while (collisions.length > 200) {
+                collisions.shift();
+            }  
+
+            ball.pos.x = collisionX;
+            ball.pos.y = collisionY;
+            var searchAttempts = 0;
+            while (!this.isBallPosInvalid(ball.pos.x, ball.pos.y, ball.radius)) {
+                console.log("Ball position invalid, looking for closest valid position...");
+                const searchRadiusFidelity = 0.1;
+                const searchAngleFidelity = 2 * Math.PI / 4;
+                
+                const angle = searchAngleFidelity * searchAttempts;
+                const searchRadius = searchRadiusFidelity * searchAttempts;
+                const searchPos = posWithAngleRadius(angle, searchRadius, ball.pos);
+                ball.pos.x = searchPos.x;
+                ball.pos.y = searchPos.y;
+                searchAttempts++;
+            }
+            
+            //const radiusRatio = ball.radius / (ball.radius + this.radius);
+            var impactNormX = impactX - collisionX;
+            var impactNormY = impactY - collisionY;
+            const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
+            impactNormX = impactNormX / impactVecLen;
+            impactNormY = impactNormY / impactVecLen;
+            const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
+            ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength * this.friction ?? 1.0;
+            ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength * this.friction ?? 1.0;
+        }  
+    }
+}
+
 class Collision {
     constructor(x, y, color="#FF0000") {
         this.x = x;
@@ -563,7 +698,7 @@ function draw() {
     c.fill();
 
     objects.forEach((obj) => obj.draw(c, ball));
-    collisions.forEach((obj) => obj.draw(c));
+    //collisions.forEach((obj) => obj.draw(c));
 
     c.strokeStyle = '#FFFFFF';
     c.lineWidth = 1;
@@ -649,19 +784,36 @@ function update() {
 
 //objects.push(new RectangleObject(5, 5, 3, 3));
 //objects.push(new PointObject(2, 2, 1));
-objects.push(new PointObject(20, 3, 1.5));
-//objects.push(new PointObject(8, 8, 1.7));
-objects.push(new PointObject(12, 12, 1.25));
-objects.push(new PointObject(15, 5, 0.4));
-objects.push(new PolyObject(10, 5, [
+//objects.push(new PointObject(20, 3, 1.5));
+objects.push(new PointObject(10, 15, 0.7));
+objects.push(new PointObject(5, 10, 1.2));
+objects.push(new PointObject(15, 10, 1.2));
+objects.push(new PointObject(10, 10, 1.5));
+objects.push(new PolyObject(18.5, 5, [
+    {x: 0, y: 0},
+    {x: 0.01, y: 10}
+]));
+objects.push(new PolyObject(5, 5, [
+    {x: 0, y: 2},
+    {x: 5, y: 1.5},
+    {x: 4.8, y: 1},
+    {x: -0.2, y: 1},
+]));
+objects.push(new PolyObject(15, 5, [
+    {x: 0, y: 2},
+    {x: 5, y: 1.5},
+    {x: 4.8, y: 1},
+    {x: -0.2, y: 1},
+]));
+/*objects.push(new PolyObject(10, 5, [
     {x: 1.2, y: 1.3},
-    {x: 0, y: 10},
+    {x: 0, y: 3},
     {x: 1.5, y: 2.5},
-    {x: 14, y: 1.5},
+    {x: 5, y: 1.5},
     {x:2, y:2},
     {x: 2, y:1}
-]));
-
+]));*/
+objects.push(new ArcObject(10, 11.5, 10, 0, Math.PI, 0.95));
 
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('click', resizeCanvas); //Any click event...
@@ -675,3 +827,4 @@ window.addEventListener("keypress", function(event) {
   });
 resizeCanvas();
 update();
+
