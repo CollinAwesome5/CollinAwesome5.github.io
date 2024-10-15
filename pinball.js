@@ -32,9 +32,11 @@ function posWithAngleRadius(angleRad, radius, offset) {
 }
 
 class PolyObject {
-    constructor(x, y, polyIndicies) {
+    constructor(x, y, polyIndicies, contactPoints = 0, closeLoop = true) {
         this.x = x;
         this.y = y;
+        this.contactPoints = contactPoints;
+        this.closeLoop = closeLoop;
         var maxX = polyIndicies[0].x; var maxY = polyIndicies[0].y;
         var minX = polyIndicies[0].x; var minY = polyIndicies[0].y;
         polyIndicies.forEach((point) => {
@@ -72,8 +74,13 @@ class PolyObject {
             c.strokeStyle = "#3FFF5F";
 
         c.beginPath();
-        const lastPoint = this.polyIndicies[this.polyIndicies.length - 1];
-        c.moveTo(cX({x:lastPoint.x + this.x}), cY({y:lastPoint.y + this.y}));
+        if (this.closeLoop) {
+            const lastPoint = this.polyIndicies[this.polyIndicies.length - 1];
+            c.moveTo(cX({x:lastPoint.x + this.x}), cY({y:lastPoint.y + this.y}));
+        } else {
+            const firstPoint = this.polyIndicies[0];
+            c.moveTo(cX({x:firstPoint.x + this.x}), cY({y:firstPoint.y + this.y}));
+        }
         for (const point of this.polyIndicies) 
             c.lineTo(cX({x:point.x + this.x}), cY({y:point.y + this.y}));
         c.stroke();
@@ -106,7 +113,7 @@ class PolyObject {
         const Yi0 = pointI0.y + this.y;
         const Xi1 = pointI1.x + this.x;
         const Yi1 = pointI1.y + this.y;
-        if (Xi1-Xi0 == 0) return undefined;
+        if (Xi1 == Xi0) return undefined;
         const Mi = (Yi1 - Yi0) / (Xi1 - Xi0);
         const Bi = Yi0 - Mi*Xi0;
 
@@ -114,7 +121,7 @@ class PolyObject {
         const Yb0 = ball.pos.y - ball.vel.y*timeStep;
         const Xb1 = ball.pos.x;
         const Yb1 = ball.pos.y;
-        if (Xb1-Xb0 == 0) return undefined;
+        if (Xb1 == Xb0) return undefined;
         const Mb = (Yb1 - Yb0) / (Xb1 - Xb0);
         const Bb = Yb0 - Mb*Xb0;
 
@@ -165,8 +172,7 @@ class PolyObject {
         const impactVecLen = Math.sqrt(impactNormX*impactNormX + impactNormY*impactNormY);
         impactNormX = impactNormX / impactVecLen;
         impactNormY = impactNormY / impactVecLen;
-
-        const distToIntercept = Math.sqrt(Math.pow(Xb0 - ballPosAtIntercept.x, 2) + Math.pow(Yb0, 2));
+        const distToIntercept = Math.sqrt(Math.pow(Xb0 - ballPosAtIntercept.x, 2) + Math.pow(Yb0 - ballPosAtIntercept.y, 2));
 
         return {ballPosAtIntercept, distToIntercept, interceptNormal: {x: impactNormX, y: impactNormY}, interceptPoint: {x:interceptPointX, y: interceptPointY}};
     }
@@ -278,9 +284,9 @@ class PolyObject {
                 const impactNormX = closestIntercept.interceptNormal.x;
                 const impactNormY = closestIntercept.interceptNormal.y;
                 const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
-                 
+                //console.log(intercept);
                 ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.friction;
-                console.log(`Velocity y: ${ball.vel.y}`);
+                //console.log(`Velocity y: ${ball.vel.y}, dot: ${dot}, impactNormY: ${impactNormY}`);
                 if (ball.vel.y > 0 && ball.vel.y < 0.1) {
                     //Roll the ball
                     console.log(`Rolling the ball...${impactNormX}`);
@@ -288,6 +294,7 @@ class PolyObject {
                     //ball.vel.x += impactNormX*10;
                 } else {
                     ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.friction;
+                    scoreBoard.addScore(this.contactPoints);
                 }
                 ball.pos = {x:closestIntercept.ballPosAtIntercept.x + ball.vel.x*timeStep*0.001, y:closestIntercept.ballPosAtIntercept.y + ball.vel.y*timeStep*0.001};
 
@@ -323,6 +330,55 @@ class PolyObject {
             }
             */
         }
+    }
+}
+
+class Scoreboard {
+    constructor(x, y, digits) {
+        this.x = x;
+        this.y = y;
+        this.digitSpacing = 2;
+        this.score = 0;
+        this.zero = [{x: 0, y: 0}, {x: 0.5, y: 0}, {x: 0.5, y: -1}, {x: 0, y: -1}, {x: 0, y: 0}];
+        this.one = [{x: 0.5, y: 0}, {x: 0.5, y: -1}];
+        this.two = [{x: 0, y: 0}, {x: 0.5, y: 0}, {x: 0.5, y: -0.5}, {x: 0, y: -0.5}, {x: 0, y: -1}, {x: 0.5, y: -1}];
+        this.three = [{x: 0, y: 0}, {x: 0.5, y: 0},{x: 0.5, y: -0.5}, {x: 0, y: -0.5}, {x: 0.5, y: -0.5}, {x: 0.5, y: -1}, {x: 0, y: -1}];
+        this.four = [{x: 0, y: 0}, {x: 0, y: -0.5},{x: 0.5, y: -0.5}, {x: 0.5, y: 0}, {x: 0.5, y: -1}];
+        this.five = [{x: 0.5, y: 0}, {x: 0, y: 0}, {x: 0, y: -0.5}, {x: 0.5, y: -0.5}, {x: 0.5, y: -1}, {x: 0, y: -1}];
+        this.six = [{x: 0, y: 0}, {x: 0, y: -1}, {x: 0.5, y: -1}, {x: 0.5, y: -0.5}, {x: 0, y: -0.5}];
+        this.seven = [{x: 0, y: 0}, {x: 0.5, y: 0}, {x: 0.5, y: -1}];
+        this.eight = [{x: 0, y: 0}, {x: 0.5, y: 0}, {x: 0.5, y: -1}, {x: 0, y: -1}, {x: 0, y: 0}, {x: 0, y: -0.5}, {x: 0.5, y: -0.5}];
+        this.nine = [{x: 0.5, y: 0},{x: 0, y: 0}, {x: 0, y: -0.5},{x: 0.5, y: -0.5},{x: 0.5, y: 0},{x: 0.5, y: -1}];
+        this.digits = [this.zero, this.one, this.two, this.three, this.four, this.five, this.six, this.seven, this.eight, this.nine];
+        this.digitCount = digits;
+        this.setScore(0);
+    }
+
+    addScore(score) {
+        this.setScore(this.score + score);
+    }
+
+    setScore(score) {
+        this.score = Math.round(score);
+        //console.log(`Set score to: ${this.score}`);
+        var workingScore = this.score;
+        this.objects = [];
+        for (var i=0;i<this.digitCount;i++) {
+            const digit = workingScore % 10;
+            workingScore = Math.floor(workingScore / 10);
+            //console.log(`got digit: ${digit}`);
+            const digitIndicies = this.digits[digit];
+            this.objects.push(new PolyObject(this.x + (this.digitCount - i)*this.digitSpacing, this.y, digitIndicies, 0, false));
+        }
+        //console.log(this.objects);
+    }
+
+    draw(canvas, ball) {
+        this.objects.forEach((digit) => digit.draw(canvas, ball));
+    }
+
+    influenceBall(ball) {
+        this.objects.forEach((digit) => digit.influenceBall(ball));
     }
 }
 
@@ -374,10 +430,11 @@ class RectangleObject {
 }
 
 class PointObject {
-    constructor(x, y, radius) {
+    constructor(x, y, radius, contactPoints = 0) {
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.contactPoints = contactPoints;
         this.surfaceType = "bounce";
         this.friction = 0.75;
         this.lastContactTime = new Date(0, 0, 0);
@@ -457,6 +514,7 @@ class PointObject {
             const dot = impactNormX * ball.vel.x + impactNormY * ball.vel.y;
             ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength;
             ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength;
+            scoreBoard.setScore(scoreBoard.score + this.contactPoints);
 
             if (!isNaN(collisionX))
                 holdCycles = 0;
@@ -519,20 +577,26 @@ class ArcObject {
     isBallPosInvalid(x, y, radius) {
         const dist = Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
         console.log(`Distance: ${Math.abs(this.radius - dist)}, Radius: ${radius}`);
-        if (radius < Math.abs(this.radius - dist)) return true;
+        if (Math.abs(this.radius - dist) > radius) return false;
         const posAngle = this.relativePosInRadians(x, y);
-        if ((posAngle > this.startRadians) && (posAngle < this.endRadians)) return false;
-        return true;
+        if ((posAngle >= this.startRadians) && (posAngle <= this.endRadians)) return true;
+        console.log("***Shouldn't really be here...***");
+        return false;
     }
 
     influenceBall(ball) {
-        const dist = Math.sqrt(Math.pow(this.x - ball.pos.x, 2) + Math.pow(this.y - ball.pos.y, 2));
-        if ((ball.radius + this.radius) >= dist) {
+        const xa = this.x;
+        const ya = this.y;
+        const x1 = ball.pos.x;
+        const y1 = ball.pos.y;
+        const x2 = ball.pos.x - ball.vel.x * timeStep;
+        const y2 = ball.pos.y - ball.vel.y * timeStep;
+//        const distStart = Math.sqrt(Math.pow(xa - x2, 2) + Math.pow(ya - y2, 2));
+//        const distEnd = Math.sqrt(Math.pow(xa - x1, 2) + Math.pow(ya - y1, 2));
+//        const maxDistToCompare = this.radius + ball.radius;
+//        const minDistToCompate = this.radius - ball.radius;
+
             
-            const xa = this.x;
-            const ya = this.y;
-            const x2 = ball.pos.x - ball.vel.x * timeStep;
-            const y2 = ball.pos.y - ball.vel.y * timeStep;
             const m=(ball.pos.y - y2) / (ball.pos.x - x2);
             const b=y2-m*x2;
             const diOut = ball.radius + this.radius;
@@ -599,8 +663,9 @@ class ArcObject {
             if (isNaN(collisionX)) return;
 
             const collisionY = m*collisionX + b;
-            const impactX = Math.cos(collisionAngle) * this.radius + this.x; //* radiusRatio;
-            const impactY = Math.sin(collisionAngle) * this.radius + this.y;// * radiusRatio;
+            const impactX = Math.cos(collisionAngle) * this.radius + this.x; 
+            const impactY = Math.sin(collisionAngle) * this.radius + this.y;
+            console.log(`Impact at dist: {${Math.sqrt(Math.pow(this.x - impactX, 2) + Math.pow(this.y - impactY, 2))}}`);
             
             collisions.push(new Collision(collisionX, collisionY, "#0FDF0F"));
             collisions.push(new Collision(impactX, impactY, "#FFDFFF"));
@@ -608,20 +673,29 @@ class ArcObject {
                 collisions.shift();
             }  
 
-            ball.pos.x = collisionX;
-            ball.pos.y = collisionY;
+            var validX = collisionX;
+            var validY = collisionY;
             var searchAttempts = 0;
-            while (!this.isBallPosInvalid(ball.pos.x, ball.pos.y, ball.radius)) {
+            while (this.isBallPosInvalid(validX, validY, ball.radius)) {
                 console.log("Ball position invalid, looking for closest valid position...");
-                const searchRadiusFidelity = 0.1;
-                const searchAngleFidelity = 2 * Math.PI / 4;
+                const searchRadiusFidelity = 0.02;
+                const searchAngleFidelity = 2 * Math.PI / 16;
                 
                 const angle = searchAngleFidelity * searchAttempts;
-                const searchRadius = searchRadiusFidelity * searchAttempts;
-                const searchPos = posWithAngleRadius(angle, searchRadius, ball.pos);
-                ball.pos.x = searchPos.x;
-                ball.pos.y = searchPos.y;
+                const searchRadius = searchRadiusFidelity * (1 + Math.floor(searchAttempts / (2*Math.PI/searchAngleFidelity)));
+                console.log(`Searching for valid position with angle: ${angle}, radius: ${searchRadius}`);
+                const searchPos = posWithAngleRadius(angle, searchRadius, {x: collisionX, y: collisionY});
+                validX = searchPos.x;
+                validY = searchPos.y;
                 searchAttempts++;
+            }
+            if (searchAttempts) console.log(`Took ${searchAttempts} attempts to find a valid location`);
+            ball.pos = {x: validX, y: validY};
+            const placedDist = Math.sqrt(Math.pow(ball.pos.x - this.x, 2) + Math.pow(ball.pos.y - this.y, 2));
+            if (placedDist >= (this.radius-ball.radius)) {
+                console.log(`Placed ball outside of valid range...${placedDist}`);
+                ball.pos = {x: 1, y: 1};
+                // exit(1);
             }
             
             //const radiusRatio = ball.radius / (ball.radius + this.radius);
@@ -634,7 +708,7 @@ class ArcObject {
             ball.vel.x = (ball.vel.x - 2 * impactNormX * dot) * this.bounceStrength * this.friction ?? 1.0;
             ball.vel.y = (ball.vel.y - 2 * impactNormY * dot) * this.bounceStrength * this.friction ?? 1.0;
         }  
-    }
+    
 }
 
 class Collision {
@@ -698,7 +772,7 @@ function draw() {
     c.fill();
 
     objects.forEach((obj) => obj.draw(c, ball));
-    //collisions.forEach((obj) => obj.draw(c));
+    //  collisions.forEach((obj) => obj.draw(c));
 
     c.strokeStyle = '#FFFFFF';
     c.lineWidth = 1;
@@ -732,6 +806,29 @@ function rpy() {
     py.value = -10;
 }
 
+function rotatePoint(xy, radians) {
+    const cosTheta = Math.cos(radians);
+    const sinTheta = Math.sin(radians);
+    const x = xy.x*cosTheta - xy.y*sinTheta;
+    const y = xy.y*cosTheta + xy.x*sinTheta;
+    return {x:x, y:y};
+}
+
+function rotateIndiciesInPlace(indicies, radians) {
+    const cosTheta = Math.cos(radians);
+    const sinTheta = Math.sin(radians);
+    for (let i=0;i<indicies.length;i++) {
+        const x = indicies[i].x*cosTheta - indicies[i].y*sinTheta;
+        const y = indicies[i].y*cosTheta + indicies[i].x*sinTheta;
+        indicies[i] = {x: x, y: y};
+    }
+}
+
+function mirrorIndiciesInPlace(indicies, yAxis = true) {
+    for (let i=0;i<indicies.length;i++) {
+        indicies[i] = {x: (yAxis ? indicies[i].x : -indicies[i].x), y: (yAxis ? -indicies[i].y : indicies[i].y)}
+    }
+}
 
 function simulate() {
     ball.vel.x += gravity.x * timeStep;
@@ -768,7 +865,8 @@ function simulate() {
         ball.vel.x *= friction;
         ball.vel.y *= friction;
     }
-
+    //if (isNaN(1 / ball.vel.x)) ball.vel.x = 0.0000001;
+    //if (isNaN(1 / ball.vel.y)) ball.vel.y = 0.0000001;
     objects.forEach((obj) => obj.influenceBall(ball));
 }
 
@@ -779,41 +877,51 @@ function update() {
         holdCycles--;
     }
     draw();
+    rotateIndiciesInPlace(flipper.polyIndicies, 0.01);
+    rotateIndiciesInPlace(flipper2.polyIndicies, -0.01);
+    if (isNaN(ball.pos.x) || isNaN(ball.pos.y) || isNaN(ball.vel.x) || isNaN(ball.vel.y)) {
+        ball.pos = {x: 1, y: 1};
+        ball.vel = {x: 1, y: 0.5};
+    }
+
     requestAnimationFrame(update);
 }
 
 //objects.push(new RectangleObject(5, 5, 3, 3));
 //objects.push(new PointObject(2, 2, 1));
 //objects.push(new PointObject(20, 3, 1.5));
-objects.push(new PointObject(10, 15, 0.7));
-objects.push(new PointObject(5, 10, 1.2));
-objects.push(new PointObject(15, 10, 1.2));
-objects.push(new PointObject(10, 10, 1.5));
+
+objects.push(new PointObject(10, 15, 0.7, 50));
+objects.push(new PointObject(5, 10, 1.2, 20));
+objects.push(new PointObject(15, 10, 1.2, 20));
+objects.push(new PointObject(10, 10, 1.5, 20));
+
 objects.push(new PolyObject(18.5, 5, [
     {x: 0, y: 0},
     {x: 0.01, y: 10}
-]));
-objects.push(new PolyObject(5, 5, [
+], 0));
+
+const flipper = new PolyObject(5, 5, [
     {x: 0, y: 2},
     {x: 5, y: 1.5},
     {x: 4.8, y: 1},
     {x: -0.2, y: 1},
-]));
-objects.push(new PolyObject(15, 5, [
+], 15);
+objects.push(flipper);
+
+const flipper2 = new PolyObject(14, 5, [
     {x: 0, y: 2},
     {x: 5, y: 1.5},
     {x: 4.8, y: 1},
     {x: -0.2, y: 1},
-]));
-/*objects.push(new PolyObject(10, 5, [
-    {x: 1.2, y: 1.3},
-    {x: 0, y: 3},
-    {x: 1.5, y: 2.5},
-    {x: 5, y: 1.5},
-    {x:2, y:2},
-    {x: 2, y:1}
-]));*/
+], 15);
+objects.push(flipper2);
+mirrorIndiciesInPlace(flipper2.polyIndicies, false);
+
 objects.push(new ArcObject(10, 11.5, 10, 0, Math.PI, 0.95));
+
+const scoreBoard = new Scoreboard(4, 18, 5);
+objects.push(scoreBoard);
 
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('click', resizeCanvas); //Any click event...
