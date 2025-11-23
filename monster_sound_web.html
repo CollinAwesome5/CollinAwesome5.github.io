@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feed the Monster</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #F1B16F;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #top {
+            flex: 2;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        #monsterImg {
+            max-height: 100%;
+            max-width: 100%;
+        }
+        #feedButton {
+            position: absolute;
+            bottom: 20px;
+            width: calc(100% - 40px);
+            height: 60px;
+            background: rgba(0, 0, 255, 0.2);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+        }
+        #bottom {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff8ee;
+            padding: 10px;
+        }
+        .soundItem {
+            padding: 12px;
+            margin: 6px 0;
+            background: #eeeeee;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #addButton {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: green;
+            color: white;
+            font-size: 32px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="top">
+        <img id="monsterImg" src="monster.png" />
+        <button id="feedButton">Feed the Monster</button>
+    </div>
+
+    <div id="bottom"></div>
+
+    <button id="addButton">+</button>
+    <input type="file" id="filePicker" accept="audio/*" multiple style="display:none" />
+
+    <script>
+        let sounds = [
+            { name: "Eating", file: "monsterSounds/eating.mp3" },
+            { name: "Burp", file: "monsterSounds/burp.mp3" },
+            { name: "Loud", file: "monsterSounds/loudApple.mp3" },
+            { name: "Slurp", file: "monsterSounds/slurping.mp3" },
+            { name: "TrowUp", file: "monsterSounds/throwUp.mp3" },
+            { name: "Nom Nom", file: "monsterSounds/nom.mp3" },
+            { name: "Roblox Nom", file: "monsterSounds/robloxeat.mp3" },
+            { name: "Yumph", file: "monsterSounds/yumph.mp3" },
+            { name: "Chips", file: "monsterSounds/chips.mp3" },
+            { name: "Garp", file: "monsterSounds/garp.mp3" },
+	    { name: "67", file: "monsterSounds/67.mp3" }
+        ];
+
+        let audio = new Audio();
+        let alternateImage = null;
+        let frame = -1;
+        let timer = null;
+
+        const monsterImg = document.getElementById("monsterImg");
+        const bottom = document.getElementById("bottom");
+
+        function renderList() {
+            bottom.innerHTML = "";
+            sounds.forEach((s, index) => {
+                const div = document.createElement("div");
+                div.className = "soundItem";
+                div.innerText = s.name;
+                div.onclick = () => playSound(index);
+                bottom.appendChild(div);
+            });
+        }
+
+        function playRandomSound() {
+            const index = Math.floor(Math.random() * sounds.length);
+            playSound(index);
+        }
+
+        function playSound(i) {
+            const s = sounds[i];
+
+            if (s.name === "TrowUp") alternateImage = "monsterSick.png";
+            else if (s.name === "Burp") alternateImage = "monsterBurp.png";
+            else alternateImage = "eating";
+
+            if (alternateImage === "eating") {
+                startAnimation();
+            } else {
+                monsterImg.src = alternateImage;
+		timer = setInterval(() => {
+                    monsterImg.src = "monster.png";
+                    alternateImage = null;
+                    clearInterval(timer);
+		}, 200*10);
+            }
+
+            audio.src = s.file instanceof File ? URL.createObjectURL(s.file) : s.file;
+            audio.play();
+        }
+
+        function startAnimation() {
+            frame = 1;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (frame > 15) {
+                    monsterImg.src = "monster.png";
+                    alternateImage = null;
+                    clearInterval(timer);
+                    return;
+                }
+                monsterImg.src = `monsterEating/frame_${frame}.png`;
+                frame++;
+            }, 200);
+        }
+
+        document.getElementById("feedButton").onclick = playRandomSound;
+
+        document.getElementById("addButton").onclick = () => {
+            document.getElementById("filePicker").click();
+        };
+
+        document.getElementById("filePicker").onchange = (event) => {
+            for (const file of event.target.files) {
+                sounds.push({ name: file.name.replace(/\.[^/.]+$/, ""), file });
+            }
+            renderList();
+        };
+
+        renderList();
+    </script>
+</body>
+</html>
