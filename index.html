@@ -2,70 +2,70 @@
 <head>
   <title>The Cool Website</title>
   <style>
-  html, body {
-    background: black;
-    height: 100%; 
-    width: 100%;
-    margin: 0;
-    overflow: hidden;
-  }
+    html, body {
+      background: black;
+      height: 100%; 
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
 
-  .insideBody {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-      top: 0;
+    .insideBody {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    canvas {
+      border: 1px solid black;
+    }
+    
+    .starfieldContainerType {
+      width: 100%;
+      height: 100%;
+      position: absolute;
       left: 0;
+      top: 0; 
+      z-index: 1;
+    }
+    .spaceInvadersContainer {
+      width: 400px;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto;
       z-index: 2;
-      display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-    
-  canvas {
-    border: 1px solid black;
-  }
-    
-  .starfieldContainerType {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0; 
-    z-index: 1;
-  }
-  .spaceInvadersContainer {
-    width: 400px;
-    height: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    z-index: 2;
-  }
-  .spaceInvadersCanvas {
-    width: 100%;
-    height: 100%;
-  }
-  .pinballContainer {
-    width: 600px;
-    height: 900px;
-    margin-left: auto;
-    margin-right: auto;
-    z-index: 2;
-  }
-  .pinballCanvas {
-    width: 100%;
-    height: 100%;
-  }
-  .mazeGame {
-    width: 50%;
-    height: 82%;
-  }
-  .selectGameMenu {
-      background: transparent;
+    }
+    .spaceInvadersCanvas {
+      width: 100%;
+      height: 100%;
+    }
+    .pinballContainer {
+      width: 600px;
+      height: 900px;
+      margin-left: auto;
+      margin-right: auto;
       z-index: 2;
-  }
-  .slide-btn {
+    }
+    .pinballCanvas {
+      width: 100%;
+      height: 100%;
+    }
+    .mazeGame {
+      width: 50%;
+      height: 82%;
+    }
+    .selectGameMenu {
+        background: transparent;
+        z-index: 2;
+    }
+    .slide-btn {
           position: relative;
           padding: 14px 32px;
           border-radius: 40px;
