@@ -88,7 +88,6 @@
             { name: "Yumph", file: "monsterSounds/yumph.mp3" },
             { name: "Chips", file: "monsterSounds/chips.mp3" },
             { name: "Garp", file: "monsterSounds/garp.mp3" },
-	    { name: "67", file: "monsterSounds/67.mp3" }
         ];
 
         let audio = new Audio();
@@ -126,11 +125,12 @@
                 startAnimation();
             } else {
                 monsterImg.src = alternateImage;
-		timer = setInterval(() => {
+				clearInternal(timer);
+				timer = setInterval(() => {
                     monsterImg.src = "monster.png";
                     alternateImage = null;
                     clearInterval(timer);
-		}, 200*10);
+				}, 200*10);
             }
 
             audio.src = s.file instanceof File ? URL.createObjectURL(s.file) : s.file;
