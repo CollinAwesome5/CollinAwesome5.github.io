@@ -26,6 +26,18 @@
     canvas {
       border: 1px solid black;
     }
+
+    .snakeGameContainerType {
+      width: 400px;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+    }
+    .snakeGameCanvasType {
+      width: 100%;
+      height: 100%;
+    }
     
     .starfieldContainerType {
       width: 100%;
@@ -101,7 +113,11 @@
 <div id="starfieldContainer" class="starfieldContainerType"></div>
   
 <div class="insideBody">
-  <canvas width="400" height="400" id="game" hidden></canvas>  
+  
+  <div id="snakeGameContainer" class="snakeGameContainerType">
+    <canvas id="snakeGameCanvas" class="snakeGameCanvasType" width="400" height="400" hidden></canvas>  
+  </div>
+  
   <div id="spaceInvadersContainer" class="spaceInvadersContainer" hidden>
     <canvas id="spaceInvadersCanvas" class="spaceInvadersCanvas"></canvas>
   </div>
@@ -200,7 +216,7 @@ function toggleMute() {
 ///----------------------------------------------------------------------------------------------
 // snake game initialization
   
-var canvas = document.getElementById('game');
+var canvas = document.getElementById('snakeGameCanvas');
 var context = canvas.getContext('2d');
 
 var grid = 20;
