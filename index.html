@@ -119,13 +119,14 @@
   <p style="color: white;">more games coming soon</p>
    <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
      <a href="https://docs.google.com/forms/d/1dzACEd2ZKxXvyS8v2MlMwBt2Irn7aT0kOrBCjdN2pn0/edit">do this form for more games</a><br><br>
-   <input type="button" class="slide-btn" value="Snake Game" onclick="setActiveGame('snakeGame');" />
-   <input type="button" class="slide-btn" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
-   <input type="button" class="slide-btn" value="Pinball" onclick="setActiveGame('pinballGame');" /><br>
-   <input type="button" class="slide-btn" value="Maze Game" onclick="setActiveGame('mazeGame');" />
-   <input type="button" class="slide-btn" value="Star" onclick="setActiveGame('star');" />
-   <input type="button" class="slide-btn" value="Feed Me" onclick="window.location.href = 'feed-me.html'" />
-   
+
+
+<a onClick="setActiveGame('snakeGame');"><button class="slide-btn">Snake Game</button></a>
+<a onClick="setActiveGame('spaceInvaders');"><button class="slide-btn">Space Invaders</button></a>
+<a onClick="setActiveGame('pinballGame');"><button class="slide-btn">Pinball</button></a>
+<a onClick="setActiveGame('mazeGame');"><button class="slide-btn">Maze Game</button></a>
+<a onClick="setActiveGame('star');"><button class="slide-btn">Star</button></a>
+<a onClick="window.location.href = 'feed-me.html';"><button class="slide-btn">Feed Me</button></a>
 
    <br>
   </div>
@@ -133,7 +134,7 @@
   <div id="inGameMenu" hidden class="selectGameMenu">
    <h1 style="color: white;">The Cool Website</h1>
    <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-   <input type="button" class="slide-btn" value="Menu" onclick="setActiveGame('none');" />
+   <a onClick="setActiveGame('none');"><button class="slide-btn">Menu</button></a>
    <br>
   </div>
 </div>
