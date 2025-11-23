@@ -65,38 +65,35 @@
       background: transparent;
       z-index: 2;
   }
-  .cool-button {
-  position: relative;
-  padding: 14px 32px;
-  font-size: 18px;
-  background: #111;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: color 0.3s ease;
-  }
+  .slide-btn {
+          position: relative;
+          padding: 14px 32px;
+          border-radius: 40px;
+          border: none;
+          font-size: 1.1rem;
+          cursor: pointer;
+          background: #222; /* initial background */
+          color: white;
+          overflow: hidden;
+          z-index: 1;
+          transition: color 0.5s ease;
+      }
 
-  .cool-button::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: #fff;
-    transform: translateY(-50%);
-    transition: left 0.35s ease;
-  }
-  
-  .cool-button:hover {
-    color: #ffca5f;
-  }
-  
-  .cool-button:hover::before {
-    left: 0;
-  }
+      .slide-btn::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, #00c851, #007bff);
+          transition: left 0.5s ease;
+          z-index: -1;
+      }
+
+      .slide-btn:hover::before {
+          left: 0;
+      }
   </style>
 </head>
   
@@ -122,12 +119,12 @@
   <p style="color: white;">more games coming soon</p>
    <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
      <a href="https://docs.google.com/forms/d/1dzACEd2ZKxXvyS8v2MlMwBt2Irn7aT0kOrBCjdN2pn0/edit">do this form for more games</a><br><br>
-   <input type="button" value="Snake Game" onclick="setActiveGame('snakeGame');" />
-   <input type="button" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
-   <input type="button" value="Pinball" onclick="setActiveGame('pinballGame');" /><br>
-   <input type="button" value="Maze Game" onclick="setActiveGame('mazeGame');" />
-   <input type="button" value="Star" onclick="setActiveGame('star');" />
-   <input type="button" class="cool-button" value="Feed Me" onclick="window.location.href = 'feed-me.html'" />
+   <input type="button" class="slide-btn" value="Snake Game" onclick="setActiveGame('snakeGame');" />
+   <input type="button" class="slide-btn" value="Space Invaders" onclick="setActiveGame('spaceInvaders');" />
+   <input type="button" class="slide-btn" value="Pinball" onclick="setActiveGame('pinballGame');" /><br>
+   <input type="button" class="slide-btn" value="Maze Game" onclick="setActiveGame('mazeGame');" />
+   <input type="button" class="slide-btn" value="Star" onclick="setActiveGame('star');" />
+   <input type="button" class="slide-btn" value="Feed Me" onclick="window.location.href = 'feed-me.html'" />
    
 
    <br>
@@ -136,7 +133,7 @@
   <div id="inGameMenu" hidden class="selectGameMenu">
    <h1 style="color: white;">The Cool Website</h1>
    <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
-   <input type="button" value="Menu" onclick="setActiveGame('none');" />
+   <input type="button" class="slide-btn" value="Menu" onclick="setActiveGame('none');" />
    <br>
   </div>
 </div>
