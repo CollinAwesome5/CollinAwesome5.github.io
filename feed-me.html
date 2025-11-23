@@ -125,7 +125,7 @@
                 startAnimation();
             } else {
                 monsterImg.src = alternateImage;
-				clearInternal(timer);
+				clearInterval(timer);
 				timer = setInterval(() => {
                     monsterImg.src = "monster.png";
                     alternateImage = null;
