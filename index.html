@@ -65,6 +65,38 @@
       background: transparent;
       z-index: 2;
   }
+  .cool-button {
+  position: relative;
+  padding: 14px 32px;
+  font-size: 18px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.3s ease;
+  }
+
+  .cool-button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    transform: translateY(-50%);
+    transition: left 0.35s ease;
+  }
+  
+  .cool-button:hover {
+    color: #ffca5f;
+  }
+  
+  .cool-button:hover::before {
+    left: 0;
+  }
   </style>
 </head>
   
@@ -95,7 +127,7 @@
    <input type="button" value="Pinball" onclick="setActiveGame('pinballGame');" /><br>
    <input type="button" value="Maze Game" onclick="setActiveGame('mazeGame');" />
    <input type="button" value="Star" onclick="setActiveGame('star');" />
-   <input type="button" value="Feed Me" onclick="window.location.href = 'feed-me.html'" />
+   <input type="button" class="cool-button" value="Feed Me" onclick="window.location.href = 'feed-me.html'" />
    
 
    <br>
