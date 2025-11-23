@@ -3,9 +3,9 @@
 
   the core logic for the space invaders game.
 
-*/
 
-/*  
+
+
     SIGame Class
 
     The Game class represents a Space Invaders game.
@@ -38,7 +38,6 @@ function SIGame() {
         invaderAcceleration: 0,
         invaderDropDistance: 20,
         rocketVelocity: 120,
-        rocketMaxFireRate: 2,
         gameWidth: 400,
         gameHeight: 300,
         fps: 50,
@@ -46,9 +45,10 @@ function SIGame() {
         invaderRanks: 5,
         invaderFiles: 10,
         shipSpeed: 120,
+        rocketMaxFireRate: 2,
         levelDifficultyMultiplier: 0.2,
         pointsPerInvader: 5,
-        limitLevelIncrease: 25
+        limitLevelIncrease: 25,
     };
 
     //  All state is in the variables below.
@@ -59,6 +59,12 @@ function SIGame() {
     this.intervalId = 0;
     this.score = 0;
     this.level = 1;
+    this.shotsFired = 0;
+    this.shotsHit = 0;
+    this.hitToMiss = 0;
+    this.part = 0;
+    this.IDKwhatToCallThis = false; 
+    //this is basicly just for seeing when it should updateS the hit to miss tatio
 
     //  The state stack.
     this.stateStack = [];
@@ -271,7 +277,7 @@ WelcomeState.prototype.draw = function(siGame, dt, ctx) {
     ctx.textBaseline="middle"; 
     ctx.textAlign="center"; 
     ctx.fillText("Space Invaders", siGame.width / 2, siGame.height/2 - 40); 
-    ctx.font="16px Arial";
+    ctx.font="20px Arial";
 
     ctx.fillText("Press 'Space' or touch to start.", siGame.width / 2, siGame.height/2); 
 };
@@ -283,6 +289,8 @@ WelcomeState.prototype.keyDown = function(siGame, keyCode) {
         siGame.score = 0;
         siGame.lives = 3;
         siGame.moveToState(new LevelIntroState(siGame.level));
+        siGame.shotsFired = 0;
+        siGame.shotsHit = 0;
     }
 };
 
@@ -295,19 +303,20 @@ GameOverState.prototype.update = function(siGame, dt) {
 };
 
 GameOverState.prototype.draw = function(siGame, dt, ctx) {
-
     //  Clear the background.
     ctx.clearRect(0, 0, siGame.width, siGame.height);
 
-    ctx.font="30px Arial";
+    ctx.font="40px Arial";
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="center"; 
     ctx.textAlign="center"; 
     ctx.fillText("Game Over!", siGame.width / 2, siGame.height/2 - 40); 
-    ctx.font="16px Arial";
-    ctx.fillText("You scored " + siGame.score + " and got to level " + siGame.level, siGame.width / 2, siGame.height/2);
-    ctx.font="16px Arial";
-    ctx.fillText("Press 'Space' to play again.", siGame.width / 2, siGame.height/2 + 40);   
+    ctx.font="20px Arial";
+    ctx.fillText("You Scored " + siGame.score + " And Got To Level " + siGame.level, siGame.width / 2, siGame.height/2);
+    ctx.font="20px Arial";
+    ctx.fillText("Press 'Space' To Play Again.", siGame.width / 2, siGame.height/2 + 40);   
+    ctx.font="20px Arial";
+    ctx.fillText("Your Hit To Miss Ratio Is " + siGame.hitToMiss + "%", siGame.width / 2, siGame.height / 2 + 20);
 };
 
 GameOverState.prototype.keyDown = function(siGame, keyCode) {
@@ -316,6 +325,10 @@ GameOverState.prototype.keyDown = function(siGame, keyCode) {
         siGame.lives = 3;
         siGame.score = 0;
         siGame.level = 1;
+        siGame.hitToMiss = 0;
+        siGame.part = 0;
+        siGame.shotsFired = 0;
+        siGame.shotsHit = 0;
         siGame.moveToState(new LevelIntroState(1));
     }
 };
@@ -471,6 +484,17 @@ PlayState.prototype.update = function(siGame, dt) {
     if(hitBottom) {
         siGame.lives = 0;
     }
+
+    //update the hit to miss ratio
+//if (siGameIDKwhatToCallThis == true;) {
+    if (siGame.shotsFired == siGame.shotsHit) {
+    siGame.hitToMiss = 100;
+} else {
+    siGame.part = siGame.shotsHit / siGame.shotsFired;
+    siGame.hitToMiss = (100 * siGame.part).toFixed(1);
+    }
+isGame.IDKwhatToCallThis = false;
+//}
     
     //  Check for rocket/invader collisions.
     for(i=0; i<this.invaders.length; i++) {
@@ -482,6 +506,8 @@ PlayState.prototype.update = function(siGame, dt) {
 
             if(rocket.x >= (invader.x - invader.width/2) && rocket.x <= (invader.x + invader.width/2) &&
                 rocket.y >= (invader.y - invader.height/2) && rocket.y <= (invader.y + invader.height/2)) {
+                siGame.shotsHit += 1;
+                siGame.IDKwhatToCallThis = true;
                 
                 //  Remove the rocket, set 'bang' so we don't process
                 //  this rocket again.
@@ -593,7 +619,7 @@ PlayState.prototype.draw = function(siGame, dt, ctx) {
     var textYpos = siGame.gameBounds.bottom + ((siGame.height - siGame.gameBounds.bottom) / 2) + 14/2;
     ctx.font="14px Arial";
     ctx.fillStyle = '#ffffff';
-    var info = "Lives: " + siGame.lives;
+    var info = "Lives: " + siGame.lives + ", hit to miss: " + siGame.hitToMiss + "%";
     ctx.textAlign = "left";
     ctx.fillText(info, siGame.gameBounds.left, textYpos);
     info = "Score: " + siGame.score + ", Level: " + siGame.level;
@@ -635,6 +661,8 @@ PlayState.prototype.fireRocket = function() {
         //  Add a rocket.
         this.rockets.push(new Rocket(this.ship.x, this.ship.y - 12, this.config.rocketVelocity));
         this.lastRocketTime = (new Date()).valueOf();
+        siGame.shotsFired += 1;
+        siGame.IDKwhatToCallThis = true;
 
         //  Play the 'shoot' sound.
         siGame.sounds.playSound('shoot');
@@ -692,6 +720,7 @@ LevelIntroState.prototype.update = function(siGame, dt) {
         this.countdownMessage = "1"; 
     } 
     if(this.countdown <= 0) {
+        //this.countdownMessage = "got to 0";   YES
         //  Move to the next level, popping this state.
         siGame.moveToState(new PlayState(siGame.config, this.level));
     }
@@ -947,4 +976,6 @@ function Star(x, y, size, velocity) {
 	this.size = size;
 	this.velocity = velocity;
 }
+
+
 
