@@ -24,19 +24,19 @@
     }
     
     canvas {
-      border: 1px solid black;
+      border: 1px solid rgb(0, 0, 0);
     }
 
     .snakeGameContainerType {
       width: 400px;
-      height: 300px;
+      height: 400px;
       margin-left: auto;
       margin-right: auto;
-      z-index: 2;
+      z-index: 0;
     }
     .snakeGameCanvasType {
-      width: 100%;
-      height: 100%;
+      width: 400px;
+      height: 400px;
     }
     
     .starfieldContainerType {
@@ -114,8 +114,8 @@
   
 <div class="insideBody">
   
-  <div id="snakeGameContainer" class="snakeGameContainerType">
-    <canvas id="snakeGameCanvas" class="snakeGameCanvasType" width="400" height="400" hidden></canvas>  
+  <div id="snakeGameContainer" class="snakeGameContainerType" hidden>
+    <canvas id="snakeGameCanvas" class="snakeGameCanvasType"></canvas>  
   </div>
   
   <div id="spaceInvadersContainer" class="spaceInvadersContainer" hidden>
@@ -162,6 +162,12 @@
 
 //  Space invaders game initialization--------------------------------------------------------------------------
 //  Create the starfield.
+let sounds = {
+  eat: new Audio(),
+  crash: new Audio(),
+};
+sounds.eat.src = "sounds/sounds_eat.mp3" instanceof File ? URL.createObjectURL("sounds/sounds_eat.mp3") : "sounds/sounds_eat.mp3";
+sounds.crash.src = "sounds/sounds_crash.mp3" instanceof File ? URL.createObjectURL("sounds/sounds_crash.mp3") : "sounds/sounds_crash.mp3";
 var starFieldContainer = document.getElementById('starfieldContainer');
 var starfield = new Starfield();
 starfield.initialise(starFieldContainer);
@@ -217,14 +223,18 @@ function toggleMute() {
 // snake game initialization
   
 var canvas = document.getElementById('snakeGameCanvas');
+//console.log("Got snake game canvas:"); console.log(canvas);
 var context = canvas.getContext('2d');
+const appleImg = new Image();
+appleImg.src = 'snakeApple.png'; // Replace with the actual path to your PNG
+
 
 var grid = 20;
 var count = 0;
   
 var snake = {
-  x: 160,
-  y: 160,
+  x: 5*grid,
+  y: 5*grid,
   
   // snake velocity. moves one grid length every frame in either the x or y direction
   dx: grid,
@@ -234,28 +244,32 @@ var snake = {
   cells: [],
   
   // length of the snake. grows when eating an apple
-  maxCells: 4
+  currentLength: 4,
+  maxLength: 1000,
 };
 var apple = {
-  x: 320,
-  y: 320
+  x: 10*grid,
+  y: 10*grid,
 };
-  
-/*
-var snakeSounds = new Sounds();
-snakeSounds.init();
-snakeSounds.loadSound('eat', 'sounds/sounds_shoot.wav');
-*/
-  
+
 // get random whole numbers in a specific range
 // @see https://stackoverflow.com/a/1527820/2124254
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function printDebugInfo(context) {
+  context.strokeStyle = '#FFFFFF';
+  context.lineWidth = 2;
+  context.font = "32px serif";
+  context.strokeText(`Snake: (${snake.x}, ${snake.y}), apple: (${apple.x}, ${apple.y})`, 1, grid*20);
+  context.strokeText(`Canvas size: (${canvas.width}, ${canvas.height})`, 1, grid*22);
+}
+
 // game loop
 function loop() {
   requestAnimationFrame(loop);  
+  if (activeGame != 'snakeGame') return;
   // slow game loop to 15 fps instead of 60 (60/15 = 4)
   if (++count < 4) {
     return;
@@ -263,6 +277,7 @@ function loop() {
 
   count = 0;
   context.clearRect(0,0,canvas.width,canvas.height);
+  //context.fillRect(0, 0,canvas.width,canvas.height);
 
   // move snake by it's velocity
   snake.x += snake.dx;
@@ -270,15 +285,14 @@ function loop() {
 
   // wrap snake position horizontally on edge of screen
   if (snake.x < 0) {
-    snake.x = canvas.width - grid;
-  }
-  else if (snake.x >= canvas.width) {
+    snake.x = Math.round(canvas.width / grid) * grid;
+  } else if (snake.x >= canvas.width) {
     snake.x = 0;
   }
   
   // wrap snake position vertically on edge of screen
   if (snake.y < 0) {
-    snake.y = canvas.height - grid;
+    snake.y = Math.round(canvas.height / grid) * grid;
   }
   else if (snake.y >= canvas.height) {
     snake.y = 0;
@@ -288,13 +302,16 @@ function loop() {
   snake.cells.unshift({x: snake.x, y: snake.y});
 
   // remove cells as we move away from them
-  if (snake.cells.length > snake.maxCells) {
+  if (snake.cells.length > snake.currentLength) {
     snake.cells.pop();
   }
 
+  //printDebugInfo(context);
+
   // draw apple
-  context.fillStyle = 'red';
-  context.fillRect(apple.x, apple.y, grid-1, grid-1);
+  context.drawImage(appleImg, apple.x, apple.y);
+  //context.fillStyle = 'red';
+  //context.fillRect(apple.x, apple.y, grid-1, grid-1);
 
   // draw snake one cell at a time
   context.fillStyle = 'green';
@@ -305,10 +322,10 @@ function loop() {
 
     // snake ate apple
     if (cell.x === apple.x && cell.y === apple.y) {
-      snake.maxCells++;
-      
+      if (snake.currentLength < snake.maxLength)
+        snake.currentLength++;
 
-      //snakeSounds.playSound('eat');
+      sounds.eat.play();
 
       // canvas is 400x400 which is 25x25 grids 
       apple.x = getRandomInt(0, 20) * grid;
@@ -320,10 +337,12 @@ function loop() {
       
       // snake occupies same space as a body part. reset game
       if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        sounds.crash.play();
+
         snake.x = 160;
         snake.y = 160;
         snake.cells = [];
-        snake.maxCells = 4;
+        snake.currentLength = 4;
         snake.dx = grid;
         snake.dy = 0;
 
@@ -334,7 +353,7 @@ function loop() {
   });
 }
 
-  document.addEventListener('touchstart', changeDirection);
+document.addEventListener('touchstart', changeDirection);
 // listen to keyboard events to move the snake
 document.addEventListener('keydown', function(e) {
   // prevent snake from backtracking on itself by checking that it's 
@@ -383,7 +402,7 @@ var activeGame = 'none';
 function setActiveGame(gameName) {
   activeGame = gameName;
   selectGameMenu.hidden = true;
-  game.hidden = true;
+  snakeGameContainer.hidden = true;
   inGameMenu.hidden = true;
   spaceInvadersContainer.hidden = true;
   pinballContainer.hidden = true;
@@ -400,7 +419,7 @@ function setActiveGame(gameName) {
       inGameMenu.hidden = false;
       break;
     case 'snakeGame':
-      game.hidden = false;
+      snakeGameContainer.hidden = false;
       inGameMenu.hidden = false;
       break;
     case 'pinballGame':
@@ -427,4 +446,6 @@ requestAnimationFrame(loop);
     
 </body>
 </html>
+
+
 
