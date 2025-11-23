@@ -67,7 +67,7 @@
 </head>
 <body>
     <div id="top">
-        <img id="monsterImg" src="monster.png" />
+        <img id="monsterImg" src="images/monster.png" />
         <button id="feedButton">Feed the Monster</button>
     </div>
 
@@ -117,8 +117,8 @@
         function playSound(i) {
             const s = sounds[i];
 
-            if (s.name === "TrowUp") alternateImage = "monsterSick.png";
-            else if (s.name === "Burp") alternateImage = "monsterBurp.png";
+            if (s.name === "TrowUp") alternateImage = "images/monsterSick.png";
+            else if (s.name === "Burp") alternateImage = "images/monsterBurp.png";
             else alternateImage = "eating";
 
             if (alternateImage === "eating") {
@@ -127,7 +127,7 @@
                 monsterImg.src = alternateImage;
 				clearInterval(timer);
 				timer = setInterval(() => {
-                    monsterImg.src = "monster.png";
+                    monsterImg.src = "images/monster.png";
                     alternateImage = null;
                     clearInterval(timer);
 				}, 200*10);
@@ -142,7 +142,7 @@
             clearInterval(timer);
             timer = setInterval(() => {
                 if (frame > 15) {
-                    monsterImg.src = "monster.png";
+                    monsterImg.src = "images/monster.png";
                     alternateImage = null;
                     clearInterval(timer);
                     return;
