@@ -402,7 +402,7 @@ PlayState.prototype.update = function(siGame, dt) {
         this.ship.x += this.shipSpeed * dt;
     }
     if(siGame.pressedKeys[KEY_SPACE]) {
-        this.fireRocket();
+        this.fireRocket(siGame);
     }
 
     //  Keep the ship in bounds.
@@ -493,7 +493,7 @@ PlayState.prototype.update = function(siGame, dt) {
     siGame.part = siGame.shotsHit / siGame.shotsFired;
     siGame.hitToMiss = (100 * siGame.part).toFixed(1);
     }
-isGame.IDKwhatToCallThis = false;
+siGame.IDKwhatToCallThis = false;
 //}
     
     //  Check for rocket/invader collisions.
@@ -609,10 +609,10 @@ PlayState.prototype.draw = function(siGame, dt, ctx) {
     }
 
     //  Draw rockets.
-    ctx.fillStyle = '#ff0000';
+    ctx.fillStyle = '#1100ffff';
     for(var i=0; i<this.rockets.length; i++) {
         var rocket = this.rockets[i];
-        ctx.fillRect(rocket.x, rocket.y - 2, 1, 4);
+        ctx.fillRect(rocket.x-1, rocket.y - 4, 3, 9);
     }
 
     //  Draw info.
@@ -641,7 +641,7 @@ PlayState.prototype.keyDown = function(siGame, keyCode) {
 
     if(keyCode == KEY_SPACE) {
         //  Fire!
-        this.fireRocket();
+        this.fireRocket(siGame);
     }
     if(keyCode == 80) {
         //  Push the pause state.
@@ -653,7 +653,7 @@ PlayState.prototype.keyUp = function(siGame, keyCode) {
 
 };
 
-PlayState.prototype.fireRocket = function() {
+PlayState.prototype.fireRocket = function(siGame) {
     //  If we have no last rocket time, or the last rocket time 
     //  is older than the max rocket rate, we can fire.
     if(this.lastRocketTime === null || ((new Date()).valueOf() - this.lastRocketTime) > (1000 / this.rocketMaxFireRate))
