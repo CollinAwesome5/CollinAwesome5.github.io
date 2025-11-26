@@ -690,7 +690,7 @@ PauseState.prototype.draw = function(siGame, dt, ctx) {
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline="middle";
     ctx.textAlign="center";
-    ctx.fillText("Paused", siGame.width / 2, siGame.height/2);
+    ctx.fillText("Paused Press p to continue ", siGame.width / 2, siGame.height/2);
     return;
 };
 
