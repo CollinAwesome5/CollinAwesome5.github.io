@@ -149,9 +149,7 @@
 
   <div id="inGameMenu" hidden class="selectGameMenu">
    <h1 style="color: white;">The Cool Website</h1>
-   <a onClick="pauseSI(); setActiveGame('none');">
-    <button class="slide-btn">Menu</button>
-   </a>
+   <a onClick="setActiveGame('none');"><button class="slide-btn">Menu</button></a>
    <br>
   </div>
 </div>
@@ -189,10 +187,6 @@ siGame.initialise(SICanvas);
 //  Start the game.
 siGame.start();
 
-function pauseSI() {
-    siGame.setState(new PauseState());
-}
-  
 //  Listen for keyboard events.
 window.addEventListener("keydown", function keydown(e) {
     var keycode = e.which || window.event.keycode;
