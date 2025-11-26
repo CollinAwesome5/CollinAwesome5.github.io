@@ -977,5 +977,9 @@ function Star(x, y, size, velocity) {
 	this.velocity = velocity;
 }
 
+function pauseGame() {
+    siGame.setState(new PauseState());
+}
+
 
 
