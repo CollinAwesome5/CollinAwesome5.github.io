@@ -1,25 +1,4 @@
-/*
-  spaceinvaders.js
 
-  the core logic for the space invaders game.
-
-
-
-
-    SIGame Class
-
-    The Game class represents a Space Invaders game.
-    Create an instance of it, change any of the default values
-    in the settings, and call 'start' to run the game.
-
-    Call 'initialise' before 'start' to set the canvas the game
-    will draw to.
-
-    Call 'moveShip' or 'shipFire' to control the ship.
-
-    Listen for 'gameWon' or 'gameLost' events to handle the game
-    ending.
-*/
 
 //  Constants for the keyboard.
 var KEY_LEFT = 37;
