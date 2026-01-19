@@ -1,1 +1,79 @@
-d
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced JS NES Assembler</title>
+<link rel="stylesheet" href="style.css">
+<style>
+    body { font-family: Arial, sans-serif; background:#1e1e1e; color:#ddd; padding:20px; }
+    h1 { color:#f36; }
+    textarea { width: 100%; height: 300px; background:#222; color:#ddd; font-family: monospace; font-size:14px; padding:10px; border:1px solid #555; }
+    input, button { margin: 5px 0; padding:8px; font-size:14px; }
+    #status { margin-top: 10px; padding:10px; background:#333; border:1px solid #555; height:150px; overflow-y:auto; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+
+<h1>Advanced JS NES Assembler</h1>
+
+<label for="asmFile">Upload ASM File (optional):</label>
+<input type="file" id="asmFile"><br>
+
+<label for="chrFile">Upload Pattern Table (.chr):</label>
+<input type="file" id="chrFile"><br>
+
+<label for="asmCode">Or Paste ASM Code Here:</label><br>
+<textarea id="asmCode" placeholder="Write your NES assembly code here..."></textarea><br>
+
+<button id="assembleBtn">Assemble ROM</button>
+
+<p>Status / Output:</p>
+<div id="status">Waiting for input...</div>
+
+<script src="assembler.js"></script>
+<script>
+const status = document.getElementById('status');
+
+document.getElementById('assembleBtn').addEventListener('click', async () => {
+    status.textContent = "Starting assembly...\n";
+
+    // Get ASM code from file or textarea
+    const asmFile = document.getElementById('asmFile').files[0];
+    let asmText = document.getElementById('asmCode').value;
+
+    if (asmFile) {
+        asmText = await asmFile.text();
+        status.textContent += "Loaded ASM from file.\n";
+    } else if (!asmText.trim()) {
+        status.textContent += "Error: No ASM code provided.\n";
+        return;
+    }
+
+    // Get CHR file
+    const chrFile = document.getElementById('chrFile').files[0];
+    if (!chrFile) {
+        status.textContent += "Error: No pattern table (.chr) uploaded.\n";
+        return;
+    }
+
+    const chrBuffer = await chrFile.arrayBuffer();
+    status.textContent += "Pattern table loaded (" + chrBuffer.byteLength + " bytes).\n";
+
+    // Call assembler function (in assembler.js)
+    try {
+        const rom = assembleNES(asmText, chrBuffer, status);
+        // Download ROM
+        const blob = new Blob([rom], { type:'application/octet-stream' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'game.nes';
+        a.click();
+        status.textContent += "ROM assembled successfully! Download started.\n";
+    } catch (err) {
+        status.textContent += "Assembly error: " + err + "\n";
+    }
+});
+</script>
+
+</body>
+</html>
