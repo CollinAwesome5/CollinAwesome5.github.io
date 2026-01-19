@@ -2,25 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Advanced JS NES Assembler</title>
-<link rel="stylesheet" href="style.css">
+<title>Advanced NES Assembler</title>
 <style>
-    body { font-family: Arial, sans-serif; background:#1e1e1e; color:#ddd; padding:20px; }
-    h1 { color:#f36; }
-    textarea { width: 100%; height: 300px; background:#222; color:#ddd; font-family: monospace; font-size:14px; padding:10px; border:1px solid #555; }
-    input, button { margin: 5px 0; padding:8px; font-size:14px; }
-    #status { margin-top: 10px; padding:10px; background:#333; border:1px solid #555; height:150px; overflow-y:auto; white-space:pre-wrap; }
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: #ddd; padding: 20px; }
+    h1 { color: #f36; }
+    textarea { width: 100%; height: 300px; background: #222; color: #ddd; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #555; }
+    input, button { margin: 5px 0; padding: 8px; font-size: 14px; }
+    #status { margin-top: 10px; padding: 10px; background: #333; border: 1px solid #555; height: 150px; overflow-y: auto; white-space: pre-wrap; }
 </style>
 </head>
 <body>
 
-<h1>Advanced JS NES Assembler</h1>
+<h1>Advanced NES Assembler</h1>
 
 <label for="asmFile">Upload ASM File (optional):</label>
 <input type="file" id="asmFile"><br>
 
 <label for="chrFile">Upload Pattern Table (.chr):</label>
-<input type="file" id="chrFile"><br>
+<input type="file" id="chrFile" required><br>
 
 <label for="asmCode">Or Paste ASM Code Here:</label><br>
 <textarea id="asmCode" placeholder="Write your NES assembly code here..."></textarea><br>
@@ -30,8 +29,9 @@
 <p>Status / Output:</p>
 <div id="status">Waiting for input...</div>
 
-<script src="assembler.js"></script>
-<script>
+<script type="module">
+import { assembleNES } from './assembler.js';
+
 const status = document.getElementById('status');
 
 document.getElementById('assembleBtn').addEventListener('click', async () => {
@@ -55,20 +55,21 @@ document.getElementById('assembleBtn').addEventListener('click', async () => {
         status.textContent += "Error: No pattern table (.chr) uploaded.\n";
         return;
     }
-
     const chrBuffer = await chrFile.arrayBuffer();
-    status.textContent += "Pattern table loaded (" + chrBuffer.byteLength + " bytes).\n";
+    status.textContent += `Pattern table loaded (${chrBuffer.byteLength} bytes).\n`;
 
-    // Call assembler function (in assembler.js)
     try {
+        // Assemble the ROM using assembler.js (which calls parser.js internally)
         const rom = assembleNES(asmText, chrBuffer, status);
-        // Download ROM
-        const blob = new Blob([rom], { type:'application/octet-stream' });
+
+        // Download the generated ROM
+        const blob = new Blob([rom], { type: 'application/octet-stream' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'game.nes';
         a.click();
-        status.textContent += "ROM assembled successfully! Download started.\n";
+
+        status.textContent += "ROM assembled successfully! Download should start.\n";
     } catch (err) {
         status.textContent += "Assembly error: " + err + "\n";
     }
