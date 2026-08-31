@@ -25,9 +25,9 @@ function touchKey(label, action, extraClass) {
 function layoutForGame(gameName) {
   if (gameName === "spaceInvaders") {
     return '<div class="tc-pad"><div class="tc-row">' +
-      touchBtn("◀", "si-left") +
+      touchBtn("<", "si-left") +
       touchBtn("FIRE", "si-fire", "tc-wide") +
-      touchBtn("▶", "si-right") +
+      touchBtn(">", "si-right") +
       "</div></div>";
   }
   if (gameName === "pinballGame") {
@@ -39,20 +39,20 @@ function layoutForGame(gameName) {
   }
   if (gameName === "mazeGame") {
     return '<div class="tc-pad">' +
-      '<div class="tc-row">' + touchBtn("▲", "maze-38") + "</div>" +
+      '<div class="tc-row">' + touchBtn("^", "maze-38") + "</div>" +
       '<div class="tc-row">' +
-        touchBtn("◀", "maze-37") +
-        touchBtn("▼", "maze-40") +
-        touchBtn("▶", "maze-39") +
+        touchBtn("<", "maze-37") +
+        touchBtn("\/", "maze-40") +
+        touchBtn(">", "maze-39") +
       "</div>" +
       '<div class="tc-row">' + touchBtn("NEW", "maze-78") + "</div>" +
       "</div>";
   }
   if (gameName === "doodleJump") {
     return '<div class="tc-pad"><div class="tc-row">' +
-      touchBtn("◀", "dj-left", "tc-wide") +
+      touchBtn("<", "dj-left", "tc-wide") +
       touchBtn("RETRY", "dj-retry") +
-      touchBtn("▶", "dj-right", "tc-wide") +
+      touchBtn(">", "dj-right", "tc-wide") +
       "</div></div>";
   }
   if (gameName === "wordle") {
