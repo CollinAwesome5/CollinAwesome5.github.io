@@ -65,7 +65,6 @@ function layoutForGame(gameName) {
     return '<div class="tc-pad"><div class="tc-row">' +
       touchBtn("NEW", "wordle-new") +
       touchBtn("LEAVE", "wordle-leave") +
-      touchBtn("LETTERS", "wordle-letters") +
       "</div></div>";
   }
   if (gameName === "typeSurvive") {
