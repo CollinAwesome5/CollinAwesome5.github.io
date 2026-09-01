@@ -1,0 +1,907 @@
+<html>
+<head>
+  <title>The Cool Website</title>
+  <style>
+    html, body {
+      background: black;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .insideBody {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    
+    canvas {
+      border: 1px solid rgb(0, 0, 0);
+    }
+
+    .snakeGameContainerType {
+      width: 800px;
+      height: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 0;
+    }
+    .snakeGameCanvasType {
+      width: 800px;
+      height: 400px;
+    }
+    
+    .starfieldContainerType {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0; 
+      z-index: 1;
+    }
+    .spaceInvadersContainer {
+      width: 400px;
+      height: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .si-phone-controls {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      padding: 8px 12px 10px;
+      box-sizing: border-box;
+      align-items: center;
+      gap: 12px;
+    }
+    body.phone-wide .si-phone-controls {
+      display: flex;
+    }
+    .si-phone-controls button {
+      min-width: 72px;
+      min-height: 44px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 10px;
+      background: rgba(20,20,20,0.8);
+      color: #fff;
+      font: bold 16px sans-serif;
+    }
+    .si-phone-controls input[type="range"] {
+      flex: 1;
+      height: 28px;
+    }
+    .spaceInvadersCanvas {
+      width: 100%;
+      height: 100%;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    .pinballContainer:not([hidden]) {
+      position: fixed;
+      inset: 0;
+      padding-bottom: 5px;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+    .pinballCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    #inGameMenu {
+      text-align: center;
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
+    body.pinball-playing #inGameMenu {
+      position: absolute;
+      top: auto;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      flex-shrink: 0;
+    }
+    body.show-touch-controls.pinball-playing #inGameMenu {
+      bottom: 100px;
+    }
+    .typeWordsContainer {
+      width: 640px;
+      height: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+    }
+    .typeWordsCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    .doodleJumpContainer {
+      width: 360px;
+      height: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+    }
+    .doodleJumpCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    .wordleContainer {
+      width: 560px;
+      height: 620px;
+      max-width: min(560px, 94vw);
+      max-height: min(620px, 74vh);
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+    }
+    .wordleCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    .wordscapesContainer {
+      width: 560px;
+      height: 720px;
+      max-width: min(560px, 94vw);
+      max-height: min(720px, 78vh);
+      margin-left: auto;
+      margin-right: auto;
+      z-index: 2;
+    }
+    .wordscapesCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      touch-action: none;
+    }
+    .mazeGame {
+      width: 100%;
+      height: 82%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mazeGame canvas {
+      display: block;
+      margin: 0 auto;
+      max-width: min(700px, 90vw);
+      max-height: min(700px, 68vh);
+      width: auto;
+      height: auto;
+    }
+    .selectGameMenu {
+        background: transparent;
+        z-index: 2;
+    }
+    #homeSettings {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 40;
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    body.home-screen #homeSettings {
+      display: flex;
+    }
+    .gear-box {
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      border: 2px solid #ffffff;
+      border-radius: 10px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gear-box svg {
+      width: 28px;
+      height: 28px;
+      fill: #ffffff;
+    }
+    #homeSettingsPanel {
+      width: 220px;
+      padding: 14px 16px;
+      border: 2px solid #ffffff;
+      border-radius: 10px;
+      background: rgba(20,20,20,0.94);
+      color: #fff;
+      font: 16px sans-serif;
+    }
+    #homeSettingsPanel label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+    #homeSettingsPanel input {
+      width: 18px;
+      height: 18px;
+    }
+    .slide-btn {
+          position: relative;
+          padding: 14px 32px;
+          border-radius: 40px;
+          border: none;
+          font-size: 1.1rem;
+          cursor: pointer;
+          background: #222; /* initial background */
+          color: white;
+          overflow: hidden;
+          z-index: 1;
+          transition: color 0.5s ease;
+      }
+
+      .slide-btn::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, #00c851, #007bff);
+          transition: left 0.5s ease;
+          z-index: -1;
+      }
+
+      .slide-btn:hover::before {
+          left: 0;
+      }
+    #touchControls {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 10px;
+      z-index: 30;
+      justify-content: center;
+      pointer-events: none;
+      padding: 0 10px;
+    }
+    body.show-touch-controls #touchControls {
+      display: flex;
+    }
+    body.show-touch-controls .insideBody {
+      padding-bottom: 150px;
+    }
+    body.touch-type .insideBody {
+      padding-bottom: 230px;
+    }
+    body.show-touch-controls.pinball-playing .pinballContainer:not([hidden]) {
+      padding-bottom: 90px;
+    }
+    .tc-pad {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: min(520px, 100%);
+    }
+    .tc-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .tc-btn {
+      min-width: 72px;
+      min-height: 56px;
+      padding: 8px 14px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      background: rgba(20,20,20,0.78);
+      color: #fff;
+      font: bold 18px sans-serif;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .tc-btn:active, .tc-btn.tc-held {
+      background: rgba(255,255,255,0.22);
+    }
+    .tc-btn.tc-wide { flex: 1; }
+    .tc-keys {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+    }
+    .tc-key {
+      min-width: 28px;
+      min-height: 36px;
+      padding: 4px 0;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      background: rgba(20,20,20,0.82);
+      color: #fff;
+      font: bold 14px sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .tc-key.tc-space { min-width: 120px; }
+    body.phone-wide .typeWordsContainer,
+    body.phone-wide .wordleContainer,
+    body.phone-wide .wordscapesContainer,
+    body.phone-wide .doodleJumpContainer,
+    body.phone-wide .spaceInvadersContainer,
+    body.phone-wide .snakeGameContainerType {
+      width: 100vw;
+      max-width: 100vw;
+    }
+    body.phone-wide .mazeGame canvas {
+      max-width: 100vw;
+    }
+    #mobileTextInput {
+      display: none;
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      height: 44px;
+      z-index: 40;
+      box-sizing: border-box;
+      padding: 0 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 10px;
+      background: rgba(20,20,20,0.92);
+      color: #fff;
+      font-size: 16px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    body.phone-keyboard #mobileTextInput {
+      display: block;
+    }
+    body.phone-keyboard #touchControls {
+      bottom: 62px;
+    }
+    body.phone-keyboard .insideBody {
+      padding-bottom: 70px;
+    }
+  </style>
+</head>
+  
+<body class="home-screen">
+<div id="starfieldContainer" class="starfieldContainerType"></div>
+<div id="homeSettings">
+  <button type="button" id="homeSettingsBtn" class="gear-box" aria-label="Settings">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.59.24-1.13.55-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.48a.5.5 0 0 0 .12.64L4.86 10.7c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.68.22l2.39-.96c.5.39 1.04.7 1.63.94l.36 2.54c.05.24.25.42.49.42h3.8c.24 0 .44-.18.49-.42l.36-2.54c.59-.24 1.13-.55 1.63-.94l2.39.96c.25.12.54.02.68-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/>
+    </svg>
+  </button>
+  <div id="homeSettingsPanel" hidden>
+    <label><input id="batterySaverToggle" type="checkbox"> Battery saver</label>
+    <label><input id="muteToggle" type="checkbox"> Mute</label>
+  </div>
+</div>
+  
+<div class="insideBody">
+
+  <div id="snakeGameContainer" class="snakeGameContainerType" hidden>
+    <canvas id="snakeGameCanvas" class="snakeGameCanvasType"></canvas>  
+  </div>
+  
+  <div id="spaceInvadersContainer" class="spaceInvadersContainer" hidden>
+    <div id="siPhoneControls" class="si-phone-controls">
+      <button id="siFireBtn" type="button">FIRE</button>
+      <input id="siMoveSlider" type="range" min="0" max="100" value="50">
+    </div>
+    <canvas id="spaceInvadersCanvas" class="spaceInvadersCanvas"></canvas>
+  </div>
+
+  <div id="pinballContainer" class="pinballContainer" hidden>
+    <canvas id="pinballCanvas" class="pinballCanvas"></canvas>
+  </div>
+
+  <div id="mazeGame" class="mazeGame" hidden>
+    <canvas id="mazeCanvas" width="700" height="700"></canvas>
+  </div>
+
+  <div id="typeWordsContainer" class="typeWordsContainer" hidden>
+    <canvas id="typeWordsCanvas" class="typeWordsCanvas"></canvas>
+  </div>
+
+  <div id="doodleJumpContainer" class="doodleJumpContainer" hidden>
+    <canvas id="doodleJumpCanvas" class="doodleJumpCanvas"></canvas>
+  </div>
+
+  <div id="wordleContainer" class="wordleContainer" hidden>
+    <canvas id="wordleCanvas" class="wordleCanvas"></canvas>
+  </div>
+
+  <div id="wordscapesContainer" class="wordscapesContainer" hidden>
+    <canvas id="wordscapesCanvas" class="wordscapesCanvas"></canvas>
+  </div>
+
+  <div id="inGameMenu" hidden class="selectGameMenu">
+   <h1 style="color: white;">The Cool Website</h1>
+   <a onClick="setActiveGame('none');"><button class="slide-btn">Menu</button></a>
+   <br>
+  </div>
+
+  <div id="selectGameMenu" class="selectGameMenu">
+   <center>
+     <h1 style="color: white;">The Cool Website</h1>
+     <p style="color: white;">more games coming soon</p>
+     <a href="https://www.youtube.com/@ryandersen1">Like and subscribe to me!!</a><br><br>
+     
+     <a onClick="setActiveGame('snakeGame');"><button class="slide-btn">Snake Game</button></a>
+     <a onClick="setActiveGame('spaceInvaders');"><button class="slide-btn">Space Invaders</button></a>
+     <a onClick="setActiveGame('pinballGame');"><button class="slide-btn">Pinball</button></a>
+     <br>
+     <a onClick="setActiveGame('mazeGame');"><button class="slide-btn">Maze Game</button></a>
+     <a onClick="setActiveGame('star');"><button class="slide-btn">Star</button></a>
+     <a onClick="window.location.href = 'feed-me.html';"><button class="slide-btn">Feed Me</button></a>
+     <br>
+     <a onClick="setActiveGame('typeSurvive');"><button class="slide-btn">Type to Survive</button></a>
+     <a onClick="setActiveGame('doodleJump');"><button class="slide-btn">Doodle Jump</button></a>
+     <a onClick="setActiveGame('wordle');"><button class="slide-btn">Wordle</button></a>
+     <br>
+     <a onClick="setActiveGame('wordscapes');"><button class="slide-btn">Wordscapes</button></a>
+     <br>
+   </center>
+  </div>
+
+</div>
+
+<div id="touchControls" aria-hidden="true"></div>
+<input id="mobileTextInput" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Type here">
+       
+<script>
+window.siteMuted = false;
+window.batterySaver = false;
+window.scheduleGameFrame = function (fn, gameName) {
+  if (window.batterySaver && typeof activeGame !== "undefined" && activeGame !== gameName) {
+    setTimeout(function () { requestAnimationFrame(fn); }, 500);
+    return;
+  }
+  requestAnimationFrame(fn);
+};
+</script>
+<script src="./spaceinvaders.js"></script>
+<script src="./pinball.js"></script>
+<script src="./maze-game.js"></script>
+<script src="./type-words-data.js"></script>
+<script src="./type-words.js"></script>
+<script src="./doodle-jump.js"></script>
+<script src="./wordle-words.js"></script>
+<script src="./wordle.js"></script>
+<script src="./wordscapes-start.js"></script>
+<script src="./wordscapes.js"></script>
+<script src="./touch-controls.js"></script>
+<script>
+
+//  Space invaders game initialization--------------------------------------------------------------------------
+//  Create the starfield.
+let sounds = {
+  eat: new Audio(),
+  crash: new Audio(),
+};
+sounds.eat.src = "sounds/sounds_eat.mp3" instanceof File ? URL.createObjectURL("sounds/sounds_eat.mp3") : "sounds/sounds_eat.mp3";
+sounds.crash.src = "sounds/sounds_crash.mp3" instanceof File ? URL.createObjectURL("sounds/sounds_crash.mp3") : "sounds/sounds_crash.mp3";
+var starFieldContainer = document.getElementById('starfieldContainer');
+var starfield = new Starfield();
+starfield.initialise(starFieldContainer);
+starfield.start();
+  
+//  Setup the canvas.
+var SICanvas = document.getElementById("spaceInvadersCanvas");
+SICanvas.width = 800;
+SICanvas.height = 350;
+
+//  Create the game.
+var siGame = new SIGame();
+//console.log('About to call initialize');
+//  Initialise it with the game canvas.
+siGame.initialise(SICanvas);
+//console.log('Finished calling initialize');
+
+//  Start the game.
+siGame.start();
+
+//  Listen for keyboard events.
+window.addEventListener("keydown", function keydown(e) {
+    var keycode = e.which || window.event.keycode;
+    if (activeGame !== "spaceInvaders") return;
+    //  Supress further processing of left/right/space (37/29/32)
+    if(keycode == 37 || keycode == 39 || keycode == 32) {
+        e.preventDefault();
+    }
+    siGame.keyDown(keycode);
+});
+window.addEventListener("keyup", function keydown(e) {
+    var keycode = e.which || window.event.keycode;
+    if (activeGame !== "spaceInvaders") return;
+    siGame.keyUp(keycode);
+});
+
+window.addEventListener("touchstart", function (e) {
+    if (activeGame !== "spaceInvaders") return;
+    if (e.target.closest && e.target.closest("#touchControls")) return;
+    siGame.touchstart(e);
+}, false);
+
+window.addEventListener('touchend', function(e){
+    if (activeGame !== "spaceInvaders") return;
+    if (e.target.closest && e.target.closest("#touchControls")) return;
+    siGame.touchend(e);
+}, false);
+
+window.addEventListener('touchmove', function(e){
+    if (activeGame !== "spaceInvaders") return;
+    if (e.target.closest && e.target.closest("#touchControls")) return;
+    siGame.touchmove(e);
+}, false);
+
+function toggleMute() {
+    siGame.mute();
+    document.getElementById("muteLink").innerText = siGame.sounds.mute ? "unmute" : "mute";
+}
+
+///----------------------------------------------------------------------------------------------
+// snake game initialization
+  
+var canvas = document.getElementById('snakeGameCanvas');
+var context = canvas.getContext('2d');
+canvas.width = 800;
+canvas.height = 400;
+const appleImg = new Image();
+appleImg.src = 'images/snakeApple.png';
+
+var grid = 20;
+var count = 0;
+var snakeCols = Math.floor(canvas.width / grid);
+var snakeRows = Math.floor(canvas.height / grid);
+  
+var snake = {
+  x: 5*grid,
+  y: 5*grid,
+  dx: grid,
+  dy: 0,
+  cells: [],
+  currentLength: 4,
+  maxLength: 1000,
+};
+var apple = {
+  x: 10*grid,
+  y: 10*grid,
+};
+
+// get random whole numbers in a specific range
+// @see https://stackoverflow.com/a/1527820/2124254
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function playSnakeSound(name) {
+  try {
+    if (window.siteMuted) return;
+    var clip = sounds[name];
+    if (!clip) return;
+    clip.currentTime = 0;
+    var playPromise = clip.play();
+    if (playPromise && playPromise.catch) playPromise.catch(function () {});
+  } catch (e) {}
+}
+
+function appleOnSnake() {
+  return snake.cells.some(function (cell) {
+    return cell.x === apple.x && cell.y === apple.y;
+  });
+}
+
+function placeApple() {
+  var tries = 0;
+  do {
+    apple.x = getRandomInt(0, snakeCols) * grid;
+    apple.y = getRandomInt(0, snakeRows) * grid;
+    tries++;
+  } while (appleOnSnake() && tries < 80);
+}
+
+function resetSnake() {
+  snake.x = 5 * grid;
+  snake.y = 5 * grid;
+  snake.cells = [];
+  snake.currentLength = 4;
+  snake.dx = grid;
+  snake.dy = 0;
+  placeApple();
+}
+
+function printDebugInfo(context) {
+  context.strokeStyle = '#FFFFFF';
+  context.lineWidth = 2;
+  context.font = "32px serif";
+  context.strokeText(`Snake: (${snake.x}, ${snake.y}), apple: (${apple.x}, ${apple.y})`, 1, grid*20);
+  context.strokeText(`Canvas size: (${canvas.width}, ${canvas.height})`, 1, grid*22);
+}
+
+// game loop
+function loop() {
+  if (window.scheduleGameFrame) {
+    window.scheduleGameFrame(loop, "snakeGame");
+  } else {
+    requestAnimationFrame(loop);
+  }
+  if (activeGame != 'snakeGame') return;
+  // slow game loop to about 7.5 fps (60/8)
+  if (++count < 8) {
+    return;
+  }
+
+  count = 0;
+  context.clearRect(0,0,canvas.width,canvas.height);
+  context.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  // move snake by it's velocity
+  snake.x += snake.dx;
+  snake.y += snake.dy;
+
+  if (snake.x < 0) {
+    snake.x = (snakeCols - 1) * grid;
+  } else if (snake.x >= snakeCols * grid) {
+    snake.x = 0;
+  }
+  if (snake.y < 0) {
+    snake.y = (snakeRows - 1) * grid;
+  } else if (snake.y >= snakeRows * grid) {
+    snake.y = 0;
+  }
+
+  snake.cells.unshift({x: snake.x, y: snake.y});
+  if (snake.cells.length > snake.currentLength) {
+    snake.cells.pop();
+  }
+
+  if (appleImg.complete && appleImg.naturalWidth) {
+    context.drawImage(appleImg, apple.x, apple.y, grid - 1, grid - 1);
+  } else {
+    context.fillStyle = '#e74c3c';
+    context.fillRect(apple.x, apple.y, grid - 1, grid - 1);
+  }
+
+  context.fillStyle = '#3dff6a';
+  snake.cells.forEach(function(cell, index) {
+    context.fillRect(cell.x, cell.y, grid-1, grid-1);  
+
+    if (cell.x === apple.x && cell.y === apple.y) {
+      if (snake.currentLength < snake.maxLength)
+        snake.currentLength++;
+      playSnakeSound('eat');
+      placeApple();
+    }
+
+    for (var i = index + 1; i < snake.cells.length; i++) {
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        playSnakeSound('crash');
+        resetSnake();
+        return;
+      }
+    }
+  });
+}
+
+document.addEventListener('touchstart', function () {
+  if (activeGame === 'snakeGame') changeDirection();
+});
+document.addEventListener('keydown', function(e) {
+  if (activeGame !== 'snakeGame') return;
+  if (e.which === 37 && snake.dx === 0) {
+    e.preventDefault();
+    snake.dx = -grid;
+    snake.dy = 0;
+  } else if (e.which === 38 && snake.dy === 0) {
+    e.preventDefault();
+    snake.dy = -grid;
+    snake.dx = 0;
+  } else if (e.which === 39 && snake.dx === 0) {
+    e.preventDefault();
+    snake.dx = grid;
+    snake.dy = 0;
+  } else if (e.which === 40 && snake.dy === 0) {
+    e.preventDefault();
+    snake.dy = grid;
+    snake.dx = 0;
+  }
+});
+
+  function changeDirection() {
+    let xdir = snake.dx;
+    let ydir = snake.dy;
+    
+    if (ydir === 0)
+      snake.dy = (xdir > 0 ? grid : -grid);
+    else 
+      snake.dy = 0;
+
+    if (xdir === 0)
+      snake.dx = (ydir > 0 ? -grid : grid);
+    else
+      snake.dx = 0;
+  }
+
+var SITE_MUTE_KEY = "coolWebsiteMute";
+var SITE_BATTERY_KEY = "coolWebsiteBatterySaver";
+window.siteMuted = false;
+window.batterySaver = false;
+
+function applySiteMute(on) {
+  window.siteMuted = !!on;
+  try { localStorage.setItem(SITE_MUTE_KEY, on ? "1" : "0"); } catch (e) {}
+  if (typeof siGame !== "undefined" && siGame.mute) siGame.mute(!!on);
+}
+
+function syncSiLoop() {
+  if (typeof siGame === "undefined" || !siGame) return;
+  if (siGame.intervalId) {
+    clearInterval(siGame.intervalId);
+    siGame.intervalId = 0;
+  }
+  if (window.batterySaver && activeGame !== "spaceInvaders") return;
+  siGame.intervalId = setInterval(function () { GameLoop(siGame); }, 1000 / siGame.config.fps);
+}
+
+function applyBatterySaver(on) {
+  window.batterySaver = !!on;
+  try { localStorage.setItem(SITE_BATTERY_KEY, on ? "1" : "0"); } catch (e) {}
+  if (typeof starfield !== "undefined" && starfield) {
+    if (on) starfield.stop();
+    else starfield.resume();
+  }
+  syncSiLoop();
+}
+
+function initHomeSettings() {
+  var box = document.getElementById("homeSettings");
+  var btn = document.getElementById("homeSettingsBtn");
+  var panel = document.getElementById("homeSettingsPanel");
+  var muteBox = document.getElementById("muteToggle");
+  var batteryBox = document.getElementById("batterySaverToggle");
+  if (!btn || !panel) return;
+  try {
+    window.siteMuted = localStorage.getItem(SITE_MUTE_KEY) === "1";
+    window.batterySaver = localStorage.getItem(SITE_BATTERY_KEY) === "1";
+  } catch (e) {}
+  if (muteBox) muteBox.checked = window.siteMuted;
+  if (batteryBox) batteryBox.checked = window.batterySaver;
+  applySiteMute(window.siteMuted);
+  applyBatterySaver(window.batterySaver);
+  btn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    panel.hidden = !panel.hidden;
+  });
+  if (muteBox) {
+    muteBox.addEventListener("change", function () {
+      applySiteMute(muteBox.checked);
+    });
+  }
+  if (batteryBox) {
+    batteryBox.addEventListener("change", function () {
+      applyBatterySaver(batteryBox.checked);
+    });
+  }
+  document.addEventListener("click", function (event) {
+    if (!box || panel.hidden) return;
+    if (!box.contains(event.target)) panel.hidden = true;
+  });
+}
+
+var activeGame = 'none';
+function setActiveGame(gameName) {
+  activeGame = gameName;
+  document.body.classList.toggle("home-screen", gameName === "none");
+  selectGameMenu.hidden = true;
+  snakeGameContainer.hidden = true;
+  inGameMenu.hidden = true;
+  spaceInvadersContainer.hidden = true;
+  pinballContainer.hidden = true;
+  mazeGame.hidden = true;
+  typeWordsContainer.hidden = true;
+  doodleJumpContainer.hidden = true;
+  wordleContainer.hidden = true;
+  wordscapesContainer.hidden = true;
+  mazeOn = false;
+  document.body.classList.toggle("pinball-playing", gameName === "pinballGame");
+  
+  switch (activeGame) {
+    case 'none':
+      selectGameMenu.hidden = false;
+      break;
+    case 'spaceInvaders':
+      spaceInvadersContainer.hidden = false;
+      inGameMenu.hidden = false;
+      while (siGame.currentState() instanceof PauseState) {
+        siGame.popState();
+      }
+      if (siGame.sounds && siGame.sounds.unlock) siGame.sounds.unlock();
+      break;
+    case 'snakeGame':
+      snakeGameContainer.hidden = false;
+      inGameMenu.hidden = false;
+      resetSnake();
+      break;
+    case 'pinballGame':
+      inGameMenu.hidden = false;
+      pinballContainer.hidden = false;
+      requestAnimationFrame(resizeCanvas);
+      break;
+    case 'mazeGame':
+      inGameMenu.hidden = false;
+      mazeGame.hidden = false;
+      //mazeOn = true;
+      break;
+    case 'typeSurvive':
+      inGameMenu.hidden = false;
+      typeWordsContainer.hidden = false;
+      resetTypeGame();
+      break;
+    case 'doodleJump':
+      inGameMenu.hidden = false;
+      doodleJumpContainer.hidden = false;
+      resetDoodleGame();
+      break;
+    case 'wordle':
+      inGameMenu.hidden = false;
+      wordleContainer.hidden = false;
+      if (typeof restoreWordleGame === "function") restoreWordleGame();
+      break;
+    case 'wordscapes':
+      inGameMenu.hidden = false;
+      wordscapesContainer.hidden = false;
+      resetWordscapesGame();
+      break;
+    case 'star':
+      inGameMenu.hidden = true;
+      break;
+    default:
+      selectGameMenu.hidden = false;
+      break;
+  }
+  if (typeof updateTouchControls === "function") updateTouchControls(activeGame);
+  if (typeof syncSiLoop === "function") syncSiLoop();
+}
+
+initHomeSettings();
+requestAnimationFrame(loop);
+
+</script>
+    
+</body>
+</html>
+
+
+
