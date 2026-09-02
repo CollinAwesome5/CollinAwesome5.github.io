@@ -157,6 +157,7 @@ function addWsPoints(amount) {
 
 function saveWsProgress() {
   try {
+    shuffleWsTiles();
     localStorage.setItem(WS_PROGRESS_KEY, JSON.stringify({
       level: wsLevelIndex,
       found: Object.keys(wsFound),
@@ -168,7 +169,6 @@ function saveWsProgress() {
       tiles: wsTiles.slice()
     }));
   } catch (e) {}
-  shuffleWsTiles();
   saveWsLevelIndex();
 }
 
