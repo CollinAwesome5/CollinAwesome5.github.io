@@ -173,7 +173,7 @@ function saveWsProgress() {
 
 function loadWsProgress() {
   try {
-    shuffleWsTiles()
+    shuffleWsTiles();
     var raw = localStorage.getItem(WS_PROGRESS_KEY);
     if (!raw) return null;
     var data = JSON.parse(raw);
