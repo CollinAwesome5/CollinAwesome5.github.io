@@ -168,6 +168,7 @@ function saveWsProgress() {
       tiles: wsTiles.slice()
     }));
   } catch (e) {}
+  shuffleWsTiles();
   saveWsLevelIndex();
 }
 
