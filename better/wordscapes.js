@@ -100,6 +100,7 @@ function loadWsLevelIndex() {
 
 function saveWsLevelIndex() {
   try {
+    shuffleWsTiles();
     localStorage.setItem(WS_LEVEL_KEY, String(wsLevelIndex));
   } catch (e) {}
 }
