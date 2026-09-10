@@ -92,6 +92,7 @@ function wsCanSpell(word, tiles) {
 }
 
 function loadWsLevelIndex() {
+  shuffleWsTiles();
   try {
     var n = parseInt(localStorage.getItem(WS_LEVEL_KEY), 10);
     if (!isNaN(n) && n >= 0) wsLevelIndex = n % wsLevels().length;
