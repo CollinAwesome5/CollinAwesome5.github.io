@@ -100,7 +100,6 @@ function loadWsLevelIndex() {
 
 function saveWsLevelIndex() {
   try {
-    shuffleWsTiles();
     localStorage.setItem(WS_LEVEL_KEY, String(wsLevelIndex));
   } catch (e) {}
 }
@@ -339,6 +338,7 @@ function resetWordscapesGame() {
 }
 
 function startWordscapesLevel(index, keepProgress) {
+  shuffleWsTiles();
   var levels = wsLevels();
   wsLevelIndex = ((index % levels.length) + levels.length) % levels.length;
   wsLevel = levels[wsLevelIndex];
