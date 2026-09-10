@@ -453,7 +453,6 @@ function shuffleWsTiles() {
     wsTiles[i] = wsTiles[j];
     wsTiles[j] = t;
   }
-  saveWsProgress();
 }
 
 function hintWsCell() {
